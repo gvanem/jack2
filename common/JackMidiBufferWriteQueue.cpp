@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackMidiUtil.h"
 #include "JackError.h"
 
-using Jack::JackMidiBufferWriteQueue;
+using namespace Jack;
 
 JackMidiBufferWriteQueue::JackMidiBufferWriteQueue()
 {
