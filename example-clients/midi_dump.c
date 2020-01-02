@@ -9,7 +9,7 @@
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) || defined(HAVE_PTHREAD_H)
 #include <pthread.h>
 #endif
 
