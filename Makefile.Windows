@@ -1,0 +1,1160 @@
+#
+# GNU-makefile for Jack2 (MinGW, MSVC and clang-cl)
+#
+# By G. Vanem <gvanem@yahoo.no> 2019.
+#
+
+TODAY     = $(shell date +%d-%B-%Y)
+THIS_FILE = Makefile.Windows
+PYTHON   ?= python
+
+VER_MAJOR = 1
+VER_MINOR = 9
+VER_PATCH = 9
+VERSION   = $(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)
+
+#
+# Change 'x_ROOT' to suite:
+#
+SRC_ROOT            = $(realpath $(MINGW32))/src
+CELT_ROOT          ?= $(SRC_ROOT)/Sound/Opus
+DB_ROOT            ?= $(SRC_ROOT)/database/gdbm-1.11
+REGEX_ROOT         ?= $(SRC_ROOT)/RegExp/regex-0.12
+LIBSAMPLERATE_ROOT ?= $(SRC_ROOT)/Sound/libsamplerate
+PORTAUDIO_ROOT     ?= $(SRC_ROOT)/Sound/PortAudio
+PTHREADS_ROOT      ?= $(SRC_ROOT)/pthreads-w32-2-9-1-release/Pre-built.2
+ASIOSDK_ROOT       ?= $(SRC_ROOT)/Sound/Portaudio/old-stuff/ASIOSDK
+
+#
+# Build options. Do a 'make realclean' after changing these.
+#
+USE_CELT         ?= 0
+USE_CRT_DEBUG    ?= 0
+USE_MONITOR      ?= 1
+USE_PTHREADS     ?= 1
+USE_WSOCK_TRACE  ?= 0
+USE_MP_COMPILE   ?= 1
+USE_CLANG_FORMAT ?= 1
+
+VPATH = common windows windows/portaudio windows/winmme windows/JackRouter example-clients
+
+#
+# The following codes used in macro 'colour_msg' assumes you have
+# MSys/Cygwin's echo with colour support.
+#
+BRIGHT_RED    = \e[1;31m
+BRIGHT_GREEN  = \e[1;32m
+BRIGHT_YELLOW = \e[1;33m
+BRIGHT_WHITE  = \e[1;37m
+
+colour_msg = @echo -e "$(1)\e[0m"
+green_msg  = $(call colour_msg,$(BRIGHT_GREEN)$(1))
+
+ifeq ($(CC),clang-cl)
+  export CL=
+  OBJ_DIR  = clang_obj
+  CXX_NAME = Clang-cl
+
+else ifeq ($(CC),cl)
+  OBJ_DIR  = MSVC_obj
+  CXX_NAME = MSVC
+
+else ifeq ($(CC),gcc)
+  OBJ_DIR  = MinGW_obj
+  CXX_NAME = MinGW
+
+else
+  $(error Usage: make -f $(THIS_FILE) CC=[gcc | cl | clang-cl] [clean | vclean | depend | all])
+endif
+
+ifeq ($(CC),gcc)
+  #
+  # MinGW specifics:
+  #
+  O        = o
+  IMPLIB   = .dll.a
+  sys_libs = $(addprefix -l,$(strip $(1:.lib=)))
+  CFLAGS   = -m32 -Wall -O2 -g -fomit-frame-pointer -ffast-math --include ./win32_config.h
+  LDFLAGS  = -m32 -Wl,--print-map
+
+  #
+  # These are all static libraries:
+  #
+  CELT_LIB       = $(CELT_ROOT)/libcelt.a
+  REGEX_LIB      = $(REGEX_ROOT)/libregex.a
+  SAMPLERATE_LIB = $(LIBSAMPLERATE_ROOT)/libsamplerate-0.a
+  PORTAUDIO_LIB  = $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
+  PTHREADS_LIB   = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
+
+else
+  #
+  # MSVC / clang-cl specifics:
+  #
+  O        = obj
+  IMPLIB   = _imp.lib
+  sys_libs = $(1)
+  DEF_ARG  = -def:
+  CFLAGS   = -nologo -MD -W3 -Zi -arch:AVX2 -FI./win32_config.h
+  LDFLAGS  = -nologo -debug -map -incremental:no -verbose
+
+  #
+  # These are all static libraries:
+  #
+  CELT_LIB       = $(CELT_ROOT)/celt.lib
+  REGEX_LIB      = $(REGEX_ROOT)/regex.lib
+  SAMPLERATE_LIB = $(LIBSAMPLERATE_ROOT)/libsamplerate-0.lib
+  PORTAUDIO_LIB  = $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
+  PTHREADS_LIB   = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
+endif
+
+#
+# Warning control:
+#
+ifeq ($(CC),clang-cl)
+  CFLAGS += -fms-compatibility              \
+            -ferror-limit=5                 \
+            -Wno-int-conversion             \
+            -Wno-enum-compare-switch        \
+            -Wno-macro-redefined            \
+            -Wno-deprecated-register        \
+            -Wno-unused-variable            \
+            -Wno-unused-private-field       \
+            -Wno-deprecated-declarations    \
+            -Wno-writable-strings           \
+            -Wno-overloaded-virtual         \
+            -Wno-incompatible-pointer-types \
+            -Wno-tautological-constant-compare
+
+          #
+          # This is an important warning; leave it in.
+          #
+          # -Wno-dll-attribute-on-redeclaration
+
+else ifeq ($(CC),cl)
+  CFLAGS += -wd4005 -wd4200 -wd4244 -wd4101 -wd4251 -wd4275 -wd4521 -wd4522
+
+else ifeq ($(CC),gcc)
+  CFLAGS += -fmax-errors=5               \
+            -Wno-unused-variable         \
+            -Wno-unused-but-set-variable \
+            -Wno-incompatible-pointer-types
+endif
+
+CFLAGS += -I.               \
+          -I./common        \
+          -I./common/jack   \
+          -I./windows       \
+          -I./compat/alloca \
+          -I$(REGEX_ROOT)
+
+ifneq ($(CC),gcc)
+  CFLAGS += -I./$(OBJ_DIR)
+endif
+
+#
+# Put the official 'PortAudio' headers before './windows/portaudio/portaudio.h'
+# Do the same for 'libsamplerate'.
+#
+CFLAGS += -I$(PORTAUDIO_ROOT)/include \
+          -I$(LIBSAMPLERATE_ROOT)/src \
+          -I./windows/portaudio
+
+#
+# Do not use 'libwsock_trace.a' for MinGW.
+#
+ifeq ($(CC),gcc)
+  WS2_32_LIB = -lws2_32
+else
+  LDFLAGS += -nodefaultlib:oldnames.lib -nodefaultlib:uuid.lib
+
+  #
+  # This imp-lib for 'VCOMP140.DLL' gets searched by default due to '$(PORTAUDIO_LIB)'!?
+  #
+  LDFLAGS += -nodefaultlib:vcomp.lib
+
+  #
+  # Use the Wsock-trace library:
+  #  https://github.com/gvanem/wsock-trace
+  #
+  # The 'wsock_trace.lib' library MUST be in %LIB%-path.
+  #
+  ifeq ($(USE_WSOCK_TRACE),1)
+    WS2_32_LIB = wsock_trace.lib
+  else
+    WS2_32_LIB = ws2_32.lib
+  endif
+endif
+
+#
+# Use the 'JACK_MONITOR' option.
+#
+ifeq ($(USE_MONITOR),1)
+  CFLAGS += -DJACK_MONITOR=1 -D__CLIENTDEBUG__=1
+endif
+
+#
+# Use CELT compression (untested).
+#
+ifeq ($(USE_CELT),1)
+  CFLAGS += -DHAVE_CELT=1 -I$(CELT_ROOT) -I$(CELT_ROOT)/include
+endif
+
+#
+# Return a unique list of .$(O)-files from .c and .cpp files.
+#
+cxx_to_obj = $(addprefix $(OBJ_DIR)/$(strip $(2)), \
+               $(notdir $(subst .c,.$(O),   $(filter %.c,   $(1))) \
+                        $(subst .cpp,.$(O), $(filter %.cpp, $(1))) ))
+
+obj_to_i = $(notdir $(1:.$(O)=.i))
+
+#
+# What to build:
+#
+TARGETS = bin/libJack.dll       \
+          lib/libJack$(IMPLIB)  \
+          bin/libJackServer.dll \
+          lib/libJackServer$(IMPLIB)
+
+#
+# Internal and external drivers:
+#
+TARGETS += $(addprefix bin/jack/, \
+             audioAdapter.dll     \
+             netadapter.dll       \
+             netmanager.dll       \
+                                  \
+             jack_dummy.dll       \
+             jack_net.dll         \
+             jack_netone.dll      \
+             jack_loopback.dll    \
+             jack_portaudio.dll   \
+             jack_profiler.dll    \
+             jack_winmme.dll)
+
+#
+# This is impossible:
+#
+# TARGETS += bin/JackRouter.dll
+
+TARGETS += $(addprefix bin/,             \
+             jackd.exe                   \
+             jack_connect.exe            \
+             jack_disconnect.exe         \
+             jack_load.exe               \
+             jack_lsp.exe                \
+             jack_netmaster.exe          \
+             jack_metro.exe              \
+             jack_midi_latency_test.exe  \
+             jack_netsource.exe          \
+             jack_netslave.exe           \
+             jack_unload.exe)
+
+ifeq ($(USE_PTHREADS),1)
+  CFLAGS  += -DHAVE_PTHREAD_H -I$(PTHREADS_ROOT)/include
+  TARGETS += bin/jack_midi_dump.exe
+endif
+
+PROGRAM_SRC = common/Jackdmp.cpp            \
+              $(addprefix example-clients/, \
+                alias.c                     \
+                bufsize.c                   \
+                connect.c                   \
+                control.c                   \
+                cpu_load.c                  \
+                evmon.c                     \
+                freewheel.c                 \
+                impulse_grabber.c           \
+                ipload.c                    \
+                ipunload.c                  \
+                latent_client.c             \
+                lsp.c                       \
+                metro.c                     \
+                midi_dump.c                 \
+                midi_latency_test.c         \
+                midiseq.c                   \
+                midisine.c                  \
+                monitor_client.c            \
+                monitor_client.c            \
+                netmaster.c                 \
+                netslave.c                  \
+                netsource.c                 \
+                property.c                  \
+                samplerate.c                \
+                session_notify.c            \
+                showtime.c                  \
+                simple_client.c             \
+                simple_session_client.c     \
+                thru_client.c               \
+                transport.c                 \
+                tw.c                        \
+                wait.c                      \
+                zombie.c)
+
+PROGRAM_OBJ = $(call cxx_to_obj, $(PROGRAM_SRC))
+PROGRAM_I   = $(call obj_to_i,   $(PROGRAM_OBJ))
+
+.SECONDARY: $(PROGRAM_OBJ)
+
+libJack_SRC = $(addprefix common/,                      \
+                JackAPI.cpp                             \
+                JackActivationCount.cpp                 \
+                JackAudioAdapter.cpp                    \
+                JackAudioAdapterInterface.cpp           \
+                JackAudioDriver.cpp                     \
+                JackAudioPort.cpp                       \
+                JackClient.cpp                          \
+                JackConnectionManager.cpp               \
+                JackControlAPI.cpp                      \
+                JackDebugClient.cpp                     \
+                JackDriver.cpp                          \
+                JackDriverLoader.cpp                    \
+                JackEngine.cpp                          \
+                JackEngineControl.cpp                   \
+                JackEngineProfiling.cpp                 \
+                JackError.cpp                           \
+                JackException.cpp                       \
+                JackExternalClient.cpp                  \
+                JackFrameTimer.cpp                      \
+                JackFreewheelDriver.cpp                 \
+                JackGenericClientChannel.cpp            \
+                JackGlobals.cpp                         \
+                JackGraphManager.cpp                    \
+                JackInternalClient.cpp                  \
+                JackInternalSessionLoader.cpp           \
+                JackLibAPI.cpp                          \
+                JackLibClient.cpp                       \
+                JackLibSampleRateResampler.cpp          \
+                JackMessageBuffer.cpp                   \
+                JackMetaData.cpp                        \
+                JackMidiPort.cpp                        \
+                JackMidiAsyncQueue.cpp                  \
+                JackMidiAsyncWaitQueue.cpp              \
+                JackMidiBufferReadQueue.cpp             \
+                JackMidiBufferWriteQueue.cpp            \
+                JackMidiDriver.cpp                      \
+                JackMidiReadQueue.cpp                   \
+                JackMidiUtil.cpp                        \
+                JackMidiWriteQueue.cpp                  \
+                JackPort.cpp                            \
+                JackPortType.cpp                        \
+                JackResampler.cpp                       \
+                JackRequestDecoder.cpp                  \
+                JackServer.cpp                          \
+                JackServerGlobals.cpp                   \
+                JackShmMem.cpp                          \
+                JackTimedDriver.cpp                     \
+                JackThreadedDriver.cpp                  \
+                JackTools.cpp                           \
+                JackTransportEngine.cpp                 \
+                JackWaitThreadedDriver.cpp              \
+                shm.c                                   \
+                ringbuffer.c)                           \
+                                                        \
+              $(addprefix windows/,                     \
+                JackMMCSS.cpp                           \
+                JackWinMutex.cpp                        \
+                JackWinNamedPipe.cpp                    \
+                JackWinNamedPipeClientChannel.cpp       \
+                JackWinNamedPipeNotifyChannel.cpp       \
+                JackWinNamedPipeServerChannel.cpp       \
+                JackWinNamedPipeServerNotifyChannel.cpp \
+                JackWinProcessSync.cpp                  \
+                JackWinSemaphore.cpp                    \
+                JackWinServerLaunch.cpp                 \
+                JackWinThread.cpp                       \
+                JackWinTime.c)
+
+libJack_OBJ = $(call cxx_to_obj, $(libJack_SRC))
+libJack_I   = $(call obj_to_i,   $(libJack_OBJ))
+
+libJackServer_SRC = $(addprefix common/,            \
+                      JackArgParser.cpp             \
+                      JackMidiAPI.cpp               \
+                      JackNetAPI.cpp                \
+                      JackNetInterface.cpp          \
+                      JackNetTool.cpp               \
+                      JackRestartThreadedDriver.cpp \
+                      JackServerAPI.cpp)            \
+                                                    \
+                    $(addprefix windows/,           \
+                      JackNetWinSocket.cpp          \
+                      getopt.c                      \
+                      getopt1.c)
+
+libJackServer_OBJ = $(call cxx_to_obj, $(libJackServer_SRC))
+libJackServer_I   = $(call obj_to_i,   $(libJackServer_OBJ))
+
+#
+# 'bin/jack/*.dll' drivers:
+#
+jack_netmanager_SRC   = common/JackNetManager.cpp
+jack_netmanager_OBJ   = $(call cxx_to_obj, $(jack_netmanager_SRC))
+jack_netmanager_I     = $(call obj_to_i,   $(jack_netmanager_OBJ))
+
+jack_audioAdapter_SRC = common/JackAudioAdapterFactory.cpp         \
+                        windows/portaudio/JackPortAudioAdapter.cpp \
+                        windows/portaudio/JackPortAudioDevices.cpp
+jack_audioAdapter_OBJ = $(call cxx_to_obj, $(jack_audioAdapter_SRC))
+jack_audioAdapter_I   = $(call obj_to_i,   $(jack_audioAdapter_OBJ))
+
+jack_dummy_SRC        = common/JackDummyDriver.cpp
+jack_dummy_OBJ        = $(call cxx_to_obj, $(jack_dummy_SRC))
+jack_dummy_I          = $(call obj_to_i,   $(jack_dummy_OBJ))
+
+jack_portaudio_SRC    = windows/portaudio/JackPortAudioDriver.cpp \
+                        windows/portaudio/JackPortAudioDevices.cpp
+jack_portaudio_OBJ    = $(call cxx_to_obj, $(jack_portaudio_SRC))
+jack_portaudio_I      = $(call obj_to_i,   $(jack_portaudio_OBJ))
+
+jack_profiler_SRC     = common/JackProfiler.cpp
+jack_profiler_OBJ     = $(call cxx_to_obj, $(jack_profiler_SRC))
+jack_profiler_I       = $(call obj_to_i,   $(jack_profiler_OBJ))
+
+jack_loopback_SRC     = common/JackLoopbackDriver.cpp
+jack_loopback_OBJ     = $(call cxx_to_obj, $(jack_loopback_SRC))
+jack_loopback_I       = $(call obj_to_i,   $(jack_loopback_OBJ))
+
+jack_net_SRC          = common/JackNetDriver.cpp
+jack_net_OBJ          = $(call cxx_to_obj, $(jack_net_SRC))
+jack_net_I            = $(call obj_to_i,   $(jack_net_OBJ))
+
+jack_netadapter_SRC   = common/JackNetAdapter.cpp
+jack_netadapter_OBJ   = $(call cxx_to_obj, $(jack_netadapter_SRC))
+jack_netadapter_I     = $(call obj_to_i,   $(jack_netadapter_OBJ))
+
+jack_netone_SRC       = common/netjack.c        \
+                        common/netjack_packet.c \
+                        common/JackNetOneDriver.cpp
+jack_netone_OBJ       = $(call cxx_to_obj, $(jack_netone_SRC))
+jack_netone_I         = $(call obj_to_i,   $(jack_netone_OBJ))
+
+jack_netmanager_SRC   = common/JackNetManager.cpp
+jack_netmanager_OBJ   = $(call cxx_to_obj, $(jack_netmanager_SRC))
+jack_netmanager_I     = $(call obj_to_i,   $(jack_netmanager_OBJ))
+
+jack_router_SRC       = windows/JackRouter/JackRouter.cpp \
+                        windows/JackRouter/profport.cpp
+jack_router_OBJ       = $(call cxx_to_obj, $(jack_router_SRC))
+jack_router_I         = $(call obj_to_i,   $(jack_router_OBJ))
+
+jack_winmme_SRC       = $(addprefix windows/winmme/, \
+                          JackWinMMEDriver.cpp       \
+                          JackWinMMEInputPort.cpp    \
+                          JackWinMMEOutputPort.cpp   \
+                          JackWinMMEPort.cpp)
+
+jack_winmme_OBJ       = $(call cxx_to_obj, $(jack_winmme_SRC))
+jack_winmme_I         = $(call obj_to_i,   $(jack_winmme_OBJ))
+
+#
+# For 'make depend'
+#
+SOURCES = $(libJack_SRC)           \
+          $(libJackServer_SRC)     \
+          $(jack_audioAdapter_SRC) \
+          $(jack_dummy_SRC)        \
+          $(jack_loopback_SRC)     \
+          $(jack_netmanager_SRC)   \
+          $(jack_netdriver_SRC)    \
+          $(jack_netone_SRC)       \
+          $(jack_winmme_SRC)       \
+          $(PROGRAM_SRC)
+
+
+ifneq ($(CC),gcc)
+  GETOPT_OBJ = $(OBJ_DIR)/getopt.obj \
+               $(OBJ_DIR)/getopt1.obj
+
+  GENERATED = $(OBJ_DIR)/unistd.h
+endif
+
+GENERATED += win32_config.h
+
+all: $(OBJ_DIR) bin bin/jack lib $(GENERATED) $(TARGETS)
+	$(call colour_msg,$(BRIGHT_GREEN)Welcome to TARGETS.)
+
+$(OBJ_DIR) bin bin/jack lib:
+	- mkdir $@
+
+$(libJack_OBJ)       $(libJack_I):       CFLAGS += -DBUILDING_JACK_DLL
+$(libJackServer_OBJ) $(libJackServer_I): CFLAGS += -DBUILDING_JACK_SERVER_DLL
+$(jack_router_OBJ)   $(jack_router_I):   CFLAGS += -I$(ASIOSDK_ROOT)/common -DWINDOWS -DJACK_LOG
+
+lib/libJack$(IMPLIB):       bin/libJack.dll
+lib/libJackServer$(IMPLIB): bin/libJackServer.dll
+
+bin/libJack.dll: $(libJack_OBJ) $(GETOPT_OBJ) $(OBJ_DIR)/libJack.res $(REGEX_LIB) $(SAMPLERATE_LIB)
+	$(call link_DLL, $@, lib/libJack$(IMPLIB), $^ $(call sys_libs, advapi32.lib winmm.lib psapi.lib shell32.lib))
+
+bin/libJackServer.dll:: $(libJackServer_OBJ) $(OBJ_DIR)/libJackServer.res lib/libJack$(IMPLIB)
+	$(call link_DLL, $@, lib/libJackServer$(IMPLIB), $^ $(WS2_32_LIB))
+
+#
+# All internal and external drivers are put in 'bin/jack'.
+# Internal and external drivers have different exported symbol names.
+#
+INTERNAL_CLIENT_EXPORTS = jack_finish jack_get_descriptor jack_initialize jack_internal_initialize
+EXTERNAL_CLIENT_EXPORTS = driver_get_descriptor driver_initialize
+
+bin/jack/audioAdapter.dll: $(jack_audioAdapter_OBJ) $(OBJ_DIR)/JackAudioAdapter.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PORTAUDIO_LIB)
+	$(call link_DLL_driver, $@, $(INTERNAL_CLIENT_EXPORTS), $^ $(call sys_libs, uuid.lib winmm.lib ole32.lib user32.lib advapi32.lib setupapi.lib))
+
+bin/jack/netadapter.dll: $(jack_netadapter_OBJ) $(OBJ_DIR)/JackNetAdapter.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(INTERNAL_CLIENT_EXPORTS), $^)
+
+bin/jack/netmanager.dll: $(jack_netmanager_OBJ) $(OBJ_DIR)/JackNetManager.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(INTERNAL_CLIENT_EXPORTS), $^ $(WS2_32_LIB))
+
+bin/jack/jack_dummy.dll: $(jack_dummy_OBJ) $(OBJ_DIR)/JackDummyDriver.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(EXTERNAL_CLIENT_EXPORTS), $^)
+
+bin/jack/jack_loopback.dll: $(jack_loopback_OBJ) $(OBJ_DIR)/JackLoopBackDriver.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(EXTERNAL_CLIENT_EXPORTS), $^)
+
+bin/jack/jack_net.dll: $(jack_net_OBJ) $(OBJ_DIR)/JackNetDriver.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(EXTERNAL_CLIENT_EXPORTS), $^)
+
+bin/jack/jack_netone.dll: $(jack_netone_OBJ) $(OBJ_DIR)/JackNetoneDriver.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(SAMPLERATE_LIB)
+	$(call link_DLL_driver, $@, $(EXTERNAL_CLIENT_EXPORTS), $^ $(WS2_32_LIB))
+
+bin/jack/jack_portaudio.dll: $(jack_portaudio_OBJ) $(OBJ_DIR)/JackPortAudio.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PORTAUDIO_LIB)
+	$(call link_DLL_driver, $@, $(EXTERNAL_CLIENT_EXPORTS), $^ $(call sys_libs, uuid.lib winmm.lib ole32.lib user32.lib advapi32.lib setupapi.lib))
+
+bin/jack/jack_profiler.dll: $(jack_profiler_OBJ) $(OBJ_DIR)/JackProfiler.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(INTERNAL_CLIENT_EXPORTS), $^)
+
+bin/jack/jack_winmme.dll: $(jack_winmme_OBJ) $(OBJ_DIR)/JackWinMME.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_DLL_driver, $@, $(EXTERNAL_CLIENT_EXPORTS), $^ $(call sys_libs, winmm.lib))
+
+#
+# This needs special attention; impossible!
+#
+bin/JackRouter.dll: $(jack_router_OBJ) $(OBJ_DIR)/JackRouter.res lib/libJack$(IMPLIB)
+	$(call link_DLL_driver, $@, DllRegisterServer DllUnregisterServer DllCanUnloadNow DllGetClassObject DllMain, $^ $(call sys_libs, winmm.lib))
+
+
+#
+# Programs:
+#
+bin/jack_netmaster.exe: $(OBJ_DIR)/netmaster.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_netslave.exe: $(OBJ_DIR)/netslave.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_netsource.exe: $(OBJ_DIR)/netsource.$(O) $(OBJ_DIR)/netjack_packet.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(SAMPLERATE_LIB)
+	$(call link_EXE, $@, $^ $(WS2_32_LIB))
+
+bin/jackd.exe: $(OBJ_DIR)/JackDmp.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_disconnect.exe: $(OBJ_DIR)/connect.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+ 	$(call link_EXE, $@, $^)
+
+bin/jack_load.exe: $(OBJ_DIR)/ipload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_unload.exe: $(OBJ_DIR)/ipunload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_midi_dump.exe: $(OBJ_DIR)/midi_dump.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PTHREADS_LIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_midi_latency_test.exe: $(OBJ_DIR)/midi_latency_test.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+bin/jack_%.exe: $(OBJ_DIR)/%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+	$(call link_EXE_def, $@, $^)
+
+#
+# Compile macros + rules:
+#
+ifeq ($(CC),gcc)
+  CXXFLAGS     = -std=c++11
+  _C_compile   = gcc $(CFLAGS) -o $(2) -c $(1)
+  _CPP_compile = g++ $(CFLAGS) -o $(2) -c $(1)
+else
+  CXXFLAGS     = -TP -EHsc
+  _C_compile   = $(CC) $(CFLAGS) -Fo./$(strip $(2)) -c $(1)
+  _CPP_compile = $(CC) $(CFLAGS) -Fo./$(strip $(2)) -c $(1)
+endif
+
+define C_compile
+  $(call _C_compile, $(1), $(2))
+  @echo
+endef
+
+define CPP_compile
+  $(call _CPP_compile, $(CXXFLAGS) $(1), $(2))
+  @echo
+endef
+
+#
+# Compilng for MSVC with '-MP' is a lot faster.
+# Note: some .c-files are compiled as C++ files.
+#
+ifeq ($(CC),cl)
+  ifeq ($(USE_MP_COMPILE),1)
+$(libJack_OBJ):
+	$(call CPP_compile, -MP $(libJack_SRC), $(OBJ_DIR)\\)
+
+$(libJackServer_OBJ):
+	$(call CPP_compile, -MP $(libJackServer_SRC), $(OBJ_DIR)\\)
+  endif
+endif
+
+$(OBJ_DIR)/%.$(O): %.c
+	$(call C_compile, $<, $@)
+
+$(OBJ_DIR)/%.$(O): %.cpp
+	$(call CPP_compile, $<, $@)
+
+
+#
+# Other rules:
+#
+$(OBJ_DIR)/%.res: $(OBJ_DIR)/%.rc
+	$(call make_res, $@, $<)
+
+$(OBJ_DIR)/libJack.rc:
+	$(call make_rc_file, $@, "Jack client library")
+
+$(OBJ_DIR)/libJackServer.rc:
+	$(call make_rc_file, $@, "Jack server library")
+
+$(OBJ_DIR)/JackAudioAdapter.rc:
+	$(call make_rc_file, $@, "Jackmp Audio Adapter Driver")
+
+$(OBJ_DIR)/JackDummyDriver.rc:
+	$(call make_rc_file, $@, "Jackmp Dummy Driver")
+
+$(OBJ_DIR)/JackLoopBackDriver.rc:
+	$(call make_rc_file, $@, "Jackmp Loopback Driver")
+
+$(OBJ_DIR)/JackNetAdapter.rc:
+	$(call make_rc_file, $@, "Jackmp NetAdapter Driver")
+
+$(OBJ_DIR)/JackNetDriver.rc:
+	$(call make_rc_file, $@, "Jackmp Net Driver")
+
+$(OBJ_DIR)/JackNetManager.rc:
+	$(call make_rc_file, $@, "Jackmp NetManager Driver")
+
+$(OBJ_DIR)/JackNetoneDriver.rc:
+	$(call make_rc_file, $@, "Jackmp NetOne Driver")
+
+$(OBJ_DIR)/JackPortAudio.rc:
+	$(call make_rc_file, $@, "Jackmp PortAudio Driver")
+
+$(OBJ_DIR)/JackProfiler.rc:
+	$(call make_rc_file, $@, "Jack Profiler Driver")
+
+$(OBJ_DIR)/JackRouter.rc:
+	$(call make_rc_file, $@, "JackRouter ASIO driver")
+
+$(OBJ_DIR)/JackWinMME.rc:
+	$(call make_rc_file, $@, "Jackmp WinMME Driver")
+
+%.i: %.c FORCE $(GENERATED) cpp_filter.py
+	$(call c_preprocess, $<, $@)
+
+%.i: %.cpp FORCE $(GENERATED) cpp_filter.py
+	$(call cpp_preprocess, $<, $@)
+
+FORCE:
+
+cpp_filter.py:
+	$(call colour_msg,$(BRIGHT_YELLOW)Generating $@)
+	$(file >  $@,#!/usr/env/python)
+	$(file >> $@,#)
+	$(file >> $@,# This file was generated automatically generated)
+	$(file >> $@,# from $(realpath $(THIS_FILE)).)
+	$(file >> $@,# DO NOT EDIT!)
+	$(file >> $@,#)
+	$(file >> $@,from __future__ import print_function)
+	$(file >> $@,if 1:)
+	$(file >> $@,$(CPP_FILTER_PY))
+
+########### man.1 file generation ###################################
+
+MAN0_FILES = $(wildcard man/*.0)
+MAN1_FILES = $(MAN0_FILES:.0=.1)
+
+docs: $(MAN1_FILES)
+
+man/%.1: man/%.0
+	$(call colour_msg,$(BRIGHT_YELLOW)Generating $@)
+	sed -e "s/!VERSION!/$(VERSION)/g" \
+	    -e "s/!DATE!/$(TODAY)/g"      < $< > $@
+
+#
+# For simplicity, this 'clean' is common to all Makefile.Windows.
+# But this will cause GNU-make to do too much work.
+#
+clean:
+	rm -f $(GENERATED) $(OBJ_DIR)/* cpp_filter.py lib.args depend.args vc1*.pdb link.tmp $(MAN1_FILES)
+	- rmdir $(OBJ_DIR)
+	@echo
+
+#
+# The '$(sort x)' function creates a unique list.
+#
+LEFTOVERS = $(sort $(TARGETS:.exe=.pdb) $(TARGETS:.dll=.pdb) \
+                   $(TARGETS:.exe=.map) $(TARGETS:.dll=.map) \
+                   $(TARGETS:.exe=.exp) $(TARGETS:.lib=.exp))
+
+vclean realclean: clean
+	rm -f $(TARGETS) $(LEFTOVERS) .depend.Windows
+	- rmdir bin/jack bin lib
+	@echo
+
+########### .h-file generation ###################################
+
+win32_config.h: $(THIS_FILE)
+	$(call Generating, $@, //)
+	@echo "#ifndef _win32_config_H"      >> $@
+	@echo "#define _win32_config_H"      >> $@
+	@echo "$$win32_config_H"             >> $@
+	@echo "#endif /* _win32_config_H */" >> $@
+
+$(OBJ_DIR)/unistd.h: $(OBJ_DIR) $(THIS_FILE)
+	$(call Generating, $@, //)
+	@echo "$$unistd_H" >> $@
+
+$(CC).args: $(THIS_FILE)
+	$(call colour_msg,$(BRIGHT_YELLOW)All CFLAGS are in $@)
+	$(call make_resp_file, $@, $(CFLAGS))
+
+#
+# The meat of 'win32_config.h'.
+#
+define win32_config_H
+
+  #if defined(__MINGW32__)
+    #define MINGW_HAS_SECURE_API 1
+    #define __STDC_FORMAT_MACROS 1
+    #define __SMP__              1
+  #else
+    #define __STDC__             1
+
+    #undef  _CRT_SECURE_NO_WARNINGS
+    #define _CRT_SECURE_NO_WARNINGS
+
+    #undef  _CRT_NONSTDC_NO_WARNINGS
+    #define _CRT_NONSTDC_NO_WARNINGS
+  #endif
+
+  /* Do not add "#define min(x,y) ..." via '<windows.h>'
+   */
+  #define NOMINMAX
+  #define WIN32_LEAN_AND_MEAN  1
+  #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+
+  #ifndef WIN32
+  #define WIN32 1
+  #endif
+
+  #ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0600   /* We need Vista+ functions */
+  #endif
+
+  #include <stddef.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <malloc.h>
+  #include <signal.h>
+  #include <io.h>
+  #include <inttypes.h>
+  #include <windows.h>
+  #include <mmsystem.h>
+  #include <psapi.h>
+
+  #define _USE_MATH_DEFINES
+  #include <math.h>
+
+  #undef  __argv
+  #undef  __argc
+
+  #define HAVE_STRUCT_TIMESPEC 1  /* For <pthreads.h> */
+  #define REGEX_MALLOC         1  /* If we compile '$(REGEX_ROOT)/regex.c' directly here */
+  #define HAVE_STRING_H        1
+  #define HAVE_SAMPLERATE      1
+
+  #ifndef SIGQUIT
+  #define SIGQUIT -1
+  #endif
+
+  #ifndef SIGTERM
+  #define SIGTERM -1
+  #endif
+
+  #ifndef SIGHUP
+  #define SIGHUP -1
+  #endif
+
+  #if defined(_MSC_VER)
+     #define _sigset_t           unsigned long long
+
+    #define strcasecmp(s1, s2)  _stricmp (s1, s2)
+    #define strdup(s)           _strdup (s)
+    #define alloca(x)           _alloca (x)
+  #else
+    /*
+     * Do not pull in <stdint.h> to keep the noise-level down
+     */
+    // #define _STDINT_H           1
+  #endif
+
+  #define JACK_LOCATION  "./bin"
+  #define ADDON_DIR      "jack"
+
+endef
+
+#
+# For MSVC / clang-cl only:
+#
+define unistd_H
+  #include <windows.h>
+  #include <io.h>
+
+  #define usleep(us) Sleep ((us) / 1000)
+
+  #ifdef  __cplusplus
+    extern "C" {
+  #endif
+
+    struct option;
+    int getopt (int argc, char *const *argv, const char *shortopts);
+    int getopt_long (int argc, char **argv, const char *shortopts, const struct option *longopts, int *longind);
+
+  #ifdef  __cplusplus
+    }
+  #endif
+endef
+
+#
+# Stuff common to all generated .rc-files:
+#
+define Jack_RC_COMMON
+
+  #include <winver.h>
+
+  #define RC_VERSION      $(VER_MAJOR),$(VER_MINOR),$(VER_PATCH),0
+  #define RC_VER_STRING  "$(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)"
+
+  #ifndef RC_DLL_NAME
+  #error "Add a 'RC_DLL_NAME' before including me."
+  #endif
+
+  #ifndef RC_DESCRIPTION
+  #error "Add a 'RC_DESCRIPTION' before including me."
+  #endif
+
+  VS_VERSION_INFO VERSIONINFO
+    FILEVERSION     RC_VERSION
+    PRODUCTVERSION  RC_VERSION
+    FILEFLAGSMASK   0x3fL
+    FILEOS          VOS__WINDOWS32
+    FILESUBTYPE     0
+    FILEFLAGS       0
+
+    #ifdef RC_FILETYPE
+      FILETYPE        RC_FILETYPE /* Could be set to 'VFT_APP'; i.e. an .exe-file */
+    #else
+      FILETYPE        VFT_DLL     /* Otherwise assume 'VFT_DLL' */
+    #endif
+
+  BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+      BLOCK "040904b0"
+      BEGIN
+        VALUE "CompanyName",      "Jack2 Audio Connection Kit; https://github.com/jackaudio/jack2"
+        VALUE "FileDescription",  RC_DESCRIPTION
+        VALUE "ProductName",      RC_DESCRIPTION
+        VALUE "FileVersion",      RC_VER_STRING " ($(CXX_NAME))"
+        VALUE "ProductVersion",   RC_VER_STRING " ($(CXX_NAME))"
+        VALUE "InternalName",     RC_DLL_NAME
+        VALUE "OriginalFilename", RC_DLL_NAME
+        VALUE "LegalCopyright",   "Copyright Grame (C) 2006-2019"
+        VALUE "PrivateBuild",     "The private build of <gvanem@yahoo.no>."
+        VALUE "Comments",         "Built on $(TODAY)"
+        VALUE "LegalTrademarks",  ""
+        VALUE "SpecialBuild",     ""
+      END
+    END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+  END
+endef
+
+export win32_config_H unistd_H Jack_RC_COMMON
+
+#
+# Generate a .rc-file with the above common content.
+#  arg1, $(1): The name of the .rc-file.
+#  arg2, $(2): The 'RC_DESCRIPTION' enclosed in '"'.
+#
+define make_rc_file
+  $(call Generating, $(1), //)
+  $(file >> $(1),  #define RC_DLL_NAME     "$(notdir $(1:.rc=.dll))" )
+  $(file >> $(1),  #define RC_DESCRIPTION $(2))
+  $(file >> $(1),$(Jack_RC_COMMON))
+endef
+
+
+#
+# $(1): File to write comment to.
+# $(2): comment start. E.g. '//', ';' or '#'
+#
+define Generating
+  $(call colour_msg,$(BRIGHT_GREEN)Generating $(strip $(1)) ...)
+  $(file >  $(1), $(2) Generated by $(realpath $(THIS_FILE)).)
+  $(file >> $(1), $(2) at $(TODAY).)
+  $(file >> $(1), $(2) DO NOT EDIT!)
+  $(file >> $(1), $(2))
+endef
+
+#
+# Make a response file using this make-macro instead of relying on
+# various 'echo' programs. Depending on Cygwin or Msys version, the cmdline
+# limit can be very low. Besides this macro avoids spawning 'sh'.
+#
+# arg1, $(1): The name of the response file
+# arg2, $(2): The content of the response file.
+#
+define make_resp_file
+  @echo -n > $(1)
+  @$(foreach l, $(2), echo '$(strip $(l))' >> $(1) ; )
+endef
+
+#
+# .$(O) -> .exe macro
+#   arg1, $(1): The .exe file.
+#   arg2, $(2): The .$(O) file(s) + libraries.
+#
+define link_EXE
+  $(call colour_msg,$(BRIGHT_GREEN)Linking $(strip $(1)) ...)
+  $(call link_EXE_$(CC), $(1), $(2))
+  @echo
+endef
+
+define link_EXE_def
+  $(call colour_msg,$(BRIGHT_GREEN)Linking $(strip $(1)) $(BRIGHT_YELLOW)(default rule))
+  $(call link_EXE_$(CC), $(1), $(2))
+  @echo
+endef
+
+define link_EXE_cl
+  link $(LDFLAGS) -out:$(strip $(1)) $(2) > link.tmp
+  @cat link.tmp >> $(1:.exe=.map)
+  @rm -f $(1:.exe=.exp) link.tmp
+endef
+
+link_EXE_clang-cl = $(call link_EXE_cl, $(1), $(2))
+link_EXE_gcc      = g++ $(LDFLAGS) -o $(1) $(2) > $(1:.exe=.map)
+
+#
+# .$(O) -> .dll macro
+#   arg1, $(1): The .dll file.
+#   arg2, $(2): The import library.
+#   arg3, $(3): The .obj file(s) and libraries.
+#
+define link_DLL
+  $(call colour_msg,$(BRIGHT_GREEN)Linking $(strip $(1)) ...)
+  $(call link_DLL_$(CC), $(1), $(2), $(3))
+  @echo
+endef
+
+define link_DLL_cl
+  link -dll $(LDFLAGS) -out:$(strip $(1)) -implib:$(strip $(2)) $(3) > link.tmp
+  @cat link.tmp >> $(1:.dll=.map)
+  @rm -f $(2:.lib=.exp) link.tmp
+endef
+
+link_DLL_clang-cl = $(call link_DLL_cl, $(1), $(2), $(3))
+link_DLL_gcc      = g++ -shared $(LDFLAGS) -o $(1) -Wl,--out-implib,$(strip $(2)) $(3) > $(1:.dll=.map)
+
+#
+# .$(O) -> .dll macro; for 'bin/jack/*.dll' drivers only.
+#   arg1, $(1): The .dll file.
+#   arg2, $(2): The symbols to export.
+#   arg3, $(3): The .obj file(s) and libraries.
+#
+#  It will export only these symbols:
+#    driver_get_descriptor
+#    driver_initialize
+#
+define link_DLL_driver
+  $(call colour_msg,$(BRIGHT_GREEN)Linking $(strip $(1)) with exports$(BRIGHT_WHITE)$(2)...)
+  $(file >  $(OBJ_DIR)/tmp.def, LIBRARY $(notdir $(1)))
+  $(file >> $(OBJ_DIR)/tmp.def, EXPORTS)
+  $(foreach sym, $(2), $(file >> $(OBJ_DIR)/tmp.def, $(sym)))
+  $(call link_DLL_$(CC), $(1), $(OBJ_DIR)/tmp.lib, $(3) $(DEF_ARG)$(OBJ_DIR)/tmp.def)
+  @rm -f $(OBJ_DIR)/tmp.lib $(OBJ_DIR)/tmp.def
+  @echo
+endef
+
+#
+# .$(O) -> .lib/.a macro; create a static library. NOT USED.
+#   arg1, $(1): The static library.
+#   arg2, $(2): The .$(O) files.
+#
+define create_lib
+  $(call colour_msg,$(BRIGHT_YELLOW)Creating $(strip $(1)) ...)
+  $(call create_lib_$(CC), $(1), $(2))
+  @echo
+endef
+
+create_lib_gcc      = ar rs $(1) $(2)
+create_lib_cl       = lib -nologo -out:$(strip $(1)) $(2)
+create_lib_clang-cl = $(call create_lib_cl, $(1), $(2))
+
+#
+# .res-macro:
+#   arg1: $(1): the .res file.
+#   arg2: $(2): the .rc file.
+#
+define make_res
+  $(call colour_msg,$(BRIGHT_GREEN)Generating resource $(strip $(1)).)
+  $(call make_res_$(CC), $(1), $(2))
+  @echo
+endef
+
+make_res_gcc      = windres -O COFF -D__MINGW32__ --target=pe-i386 -o $(1) $(2)
+make_res_cl       = rc -nologo -D_MSC_VER  -Fo $(1) $(2)
+make_res_clang-cl = rc -nologo -D__clang__ -Fo $(1) $(2)
+
+#
+# Rules and macros for .c/.cpp-file preprocessing:
+#   arg1, $(1): The .c-file to preprocess.
+#   arg2, $(2): The .i-file generated.
+#   arg3, $(3): if non-empty, filter through Gnu 'indent' or 'clang-format' too.
+#
+ifeq ($(USE_CLANG_FORMAT),1)
+  CPP_FORMATTER = | clang-format -style=Mozilla -assume-filename=cpp
+  C_FORMATTER   = | clang-format -style=Mozilla -assume-filename=c
+else
+  CPP_FORMATTER =
+  C_FORMATTER   =
+endif
+
+define preprocess_cmd
+  $(CC) -E $(CFLAGS) $(1) | $(PYTHON) cpp_filter.py > $(2)
+  @echo
+endef
+
+c_preprocess   = $(call preprocess_cmd, $(1) $(C_FORMATTER), $(2))
+cpp_preprocess = $(call preprocess_cmd, $(1) $(CPP_FORMATTER), $(2))
+
+#
+# A Python "C/C++ preprocess filter".
+#
+# Sometimes it's nice to study the preprocessed output to see exactly what
+# the C/C++ compiler is given.
+#
+# Used like "make -f Makefile.Windows foo.i".
+# Ref: the '%.i: %.c' rule above.
+#
+define CPP_FILTER_PY
+  import sys, os
+
+  try:
+    import ntpath
+  except ImportError as e:
+    print ("Failed to import ntpath: %s" % e)
+    sys.exit(1)
+
+  def _win32_abspath (path):
+    path = ntpath.abspath (path)
+    return path.replace ('\\', '/')
+
+  def skip_cwd (s1, s2):
+    ''' Skip the leading part that is in common with s1 and s2
+    '''
+    i = 0
+    while i < len(s1) and s1[i] == s2[i]:
+       i += 1
+    return s2[i:]
+
+  cwd = _win32_abspath (os.getcwd()) + '/'
+
+  last_line  = '??'
+  last_fname = '??'
+  empty_lines = 0
+
+  while True:
+    line = sys.stdin.readline()
+    if not line:
+      break
+    if line.startswith('\n') or line.startswith('\r'):
+      empty_lines += 1
+      continue
+
+    line = line.replace ("\\\\", "/")
+    fname = None
+    quote = line.find ('\"')
+
+    if line.startswith ("#line ") and quote > 0:
+      fname = _win32_abspath (line[quote:])
+      last_fname = fname
+
+    if line.strip() != '' and last_line != '':
+      if fname is None or fname != last_fname:
+        print (line, end="")
+        if line.strip() == '}':  # Print a newline after a function
+          print ("")
+
+    last_line = line
+
+  if empty_lines > 0:
+    sys.stderr.write ("Removed %d empty lines." % empty_lines)
+
+endef
+
+#### 'make depend' stuff #########################################################
+
+DEP_CFLAGS = -MM $(filter -D% -I%, $(CFLAGS)) --include win32_config.h
+
+#
+# Filter out the 'win32_config.h' header to avoid GNU-make doing too much work.
+#
+dep_replace = sed -e 's|^\(.*\)\.o: |\n$(strip $(1))\1\.$$(O): |' \
+                  -e 's|[\.\/a-z]*win32_config\.h| |g'
+
+#
+# Replace '$(X_ROOT)' with '$$(X_ROOT)' in case these directories changes.
+#
+dep_replace += -e 's|$(REGEX_ROOT)|$$(REGEX_ROOT)|g'                 \
+               -e 's|$(LIBSAMPLERATE_ROOT)|$$(LIBSAMPLERATE_ROOT)|g' \
+               -e 's|$(PORTAUDIO_ROOT)|$$(PORTAUDIO_ROOT)|g'         \
+               -e 's|$(PTHREADS_ROOT)|$$(PTHREADS_ROOT)|g'           \
+               -e 's|$(ASIOSDK_ROOT)|$$(ASIOSDK_ROOT)|g'
+
+#
+#
+# arg1: $(1): the .c-files to generate dependencies for.
+# arg2: $(2): the prefix for all '.$(O)' files.
+# arg3: $(3): optional arguments
+#
+define make_deps
+  $(call make_resp_file, depend.args, $(DEP_CFLAGS) $(1))
+  $(call colour_msg,$(BRIGHT_YELLOW)Generating dependencies for $(words $(1)) files...)
+  g++ @depend.args $(3) | $(call dep_replace, $(2)) >> .depend.Windows
+  @echo
+endef
+
+#
+# If ones does 'make vclean depend', '$(OBJ_DIR)' could be needed first.
+#
+depend: $(OBJ_DIR) $(GENERATED)
+	$(call Generating, .depend.Windows, #)
+	$(call make_deps, $(sort $(SOURCES)), $$(OBJ_DIR)\/)
+	$(call make_deps, $(jack_router_SRC), $$(OBJ_DIR)\/, -I$(ASIOSDK_ROOT)/common)
+
+-include .depend.Windows
+
