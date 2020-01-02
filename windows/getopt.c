@@ -203,10 +203,6 @@ static char *posixly_correct;
 /* Avoid depending on library functions or files
    whose names are inconsistent.  */
 
-#ifndef getenv
-extern char *getenv ();
-#endif
-
 static char *
 my_index (str, chr)
      const char *str;
