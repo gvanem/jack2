@@ -10,6 +10,7 @@ set SAMPLERATE_LIB=./windows/Release/bin/libsamplerate_x86.a
 
 if %1. == build. (
   cd %APPVEYOR_BUILD_FOLDER%\src
+  gcc -v
   mingw32-make -f Makefile.Windows USE_MP_COMPILE=0 USE_PTHREADS=0 CC=gcc all
 ) else (
   echo Usage: %~dp0appveyor-script.bat "build"
