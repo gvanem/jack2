@@ -32,7 +32,7 @@ using namespace Jack;
 #include <fcntl.h>
 #include <io.h>
 
-#if defined(_MSC_VER) || defined(__MINGW__) || defined(__MINGW32__)
+#if defined(_WIN32)
 
 static char*
 find_path_to_jackdrc(char *path_to_jackdrc)

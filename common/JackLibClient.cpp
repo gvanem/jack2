@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+#if 0
 // Used for external C API (JackAPI.cpp)
 JackGraphManager* GetGraphManager()
 {
@@ -50,6 +51,7 @@ JackSynchro* GetSynchroTable()
 {
     return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
 }
+#endif
 
 // Used for client-side Metadata API (JackLibAPI.cpp)
 JackMetadata* GetMetadata()
@@ -96,15 +98,15 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_uuid_t u
     int shared_engine, shared_client, shared_graph, result;
     bool res;
     jack_log("JackLibClient::Open name = %s", name);
-    
+
     if (strlen(name) >= JACK_CLIENT_NAME_SIZE) {
         jack_error("\"%s\" is too long to be used as a JACK client name.\n"
                    "Please use %lu characters or less",
                    name,
                    JACK_CLIENT_NAME_SIZE - 1);
-        return -1; 
+        return -1;
     }
-    
+
     strncpy(fServerName, server_name, sizeof(fServerName));
 
     // Open server/client channel

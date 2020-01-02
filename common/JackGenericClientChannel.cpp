@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+#include "JackCompilerDeps.h"
 #include "JackGenericClientChannel.h"
 #include "JackClient.h"
 #include "JackGlobals.h"
@@ -34,7 +35,7 @@ JackGenericClientChannel::~JackGenericClientChannel()
 int JackGenericClientChannel::ServerCheck(const char* server_name)
 {
     jack_log("JackGenericClientChannel::ServerCheck = %s", server_name);
-  
+
     // Connect to server
     if (fRequest->Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server request channel");
@@ -52,13 +53,13 @@ void JackGenericClientChannel::ServerSyncCall(JackRequest* req, JackResult* res,
         *result = -1;
         return;
     }
-    
+
     if (!JackGlobals::fServerRunning) {
         jack_error("Server is not running");
         *result = -1;
         return;
     }
-    
+
     if (req->Write(fRequest) < 0) {
         jack_error("Could not write request type = %ld", req->fType);
         *result = -1;
@@ -82,13 +83,13 @@ void JackGenericClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res
         *result = -1;
         return;
     }
-    
+
     if (!JackGlobals::fServerRunning) {
         jack_error("Server is not running");
         *result = -1;
         return;
     }
-    
+
     if (req->Write(fRequest) < 0) {
         jack_error("Could not write request type = %ld", req->fType);
         *result = -1;

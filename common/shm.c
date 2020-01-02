@@ -14,7 +14,7 @@
 /*
  Copyright (C) 2001-2003 Paul Davis
  Copyright (C) 2005-2012 Grame
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
@@ -612,7 +612,7 @@ jack_cleanup_shm ()
 		} else {
 
 			/* see if allocator still exists */
-		#ifdef WIN32 
+		#ifdef WIN32
 			//jack_info("TODO: kill API not available !!");
 		#else
 			if (kill (r->allocator, 0)) {
@@ -742,7 +742,7 @@ jack_access_registry (jack_shm_info_t *ri)
 	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
-	close (shm_fd); 
+	close (shm_fd);
 	return 0;
 }
 
@@ -801,7 +801,7 @@ jack_create_registry (jack_shm_info_t *ri)
 
 	/* initialize registry contents */
 	jack_shm_init_registry ();
-	close (shm_fd); 
+	close (shm_fd);
 	return 0;
 }
 
@@ -976,7 +976,7 @@ jack_access_registry (jack_shm_info_t *ri)
 
 	/* set up global pointers */
 	ri->index = JACK_SHM_REGISTRY_INDEX;
-	jack_shm_header = ri->ptr.attached_at;
+	jack_shm_header = (jack_shm_header_t *) ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
 	//CloseHandle(shm_fd);  // TO CHECK
@@ -1009,7 +1009,7 @@ jack_create_registry (jack_shm_info_t *ri)
 
 	/* set up global pointers */
 	ri->index = JACK_SHM_REGISTRY_INDEX;
-	jack_shm_header = ri->ptr.attached_at;
+	jack_shm_header = (jack_shm_header_t *) ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
 	/* initialize registry contents */
