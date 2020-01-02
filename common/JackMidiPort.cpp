@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-SERVER_EXPORT void JackMidiBuffer::Reset(jack_nframes_t nframes)
+void JackMidiBuffer::Reset(jack_nframes_t nframes)
 {
     /* This line ate 1 hour of my life... dsbaikov */
     this->nframes = nframes;
@@ -37,7 +37,7 @@ SERVER_EXPORT void JackMidiBuffer::Reset(jack_nframes_t nframes)
     lost_events = 0;
 }
 
-SERVER_EXPORT jack_shmsize_t JackMidiBuffer::MaxEventSize() const
+jack_shmsize_t JackMidiBuffer::MaxEventSize() const
 {
     assert (((jack_shmsize_t) - 1) < 0); // jack_shmsize_t should be signed
     jack_shmsize_t left = buffer_size - (sizeof(JackMidiBuffer) + sizeof(JackMidiEvent) * (event_count + 1) + write_pos);
@@ -50,7 +50,7 @@ SERVER_EXPORT jack_shmsize_t JackMidiBuffer::MaxEventSize() const
     return left;
 }
 
-SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time, jack_shmsize_t size)
+jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time, jack_shmsize_t size)
 {
     jack_shmsize_t space = MaxEventSize();
     if (space == 0 || size > space) {
@@ -62,11 +62,11 @@ SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time
     JackMidiEvent* event = &events[event_count++];
     event->time = time;
     event->size = size;
-    
+
     if (size <= JackMidiEvent::INLINE_SIZE_MAX) {
         return event->data;
     }
-   
+
     write_pos += size;
     event->offset = buffer_size - write_pos;
     return (jack_midi_data_t*)this + event->offset;
@@ -87,8 +87,8 @@ void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
  * it should perform quite good.
  * More efficient (and possibly, fastest possible) implementation (it exists),
  * using calendar queue algorithm is about 3 times bigger, and uses alloca().
- * So, let's listen to D.Knuth about premature optimisation, a leave the current
- * implementation as is, until it is proved to be a bottleneck.
+ * So, let's listen to D.Knuth about premature optimisation, and leave the current
+ * implementation as is, until it is proven to be a bottleneck.
  * Dmitry Baikov.
  */
 static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes)
@@ -100,7 +100,7 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     }
     mix->Reset(nframes);
 
-    uint32_t mix_index[src_count];
+    uint32_t *mix_index = (uint32_t*) alloca (sizeof(uint32_t)*src_count);
     int event_count = 0;
     for (int i = 0; i < src_count; ++i) {
         JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);

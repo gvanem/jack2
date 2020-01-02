@@ -32,33 +32,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 using namespace Jack;
 
+#if 0     /* Already in 'common/jack/jack.h' */
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    jack_client_t * jack_client_new_aux (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status);
+    Jack_API_EXPORT jack_client_t * jack_client_new_aux (const char *client_name,
+                                                         jack_options_t options,
+                                                         jack_status_t *status);
 
-    LIB_EXPORT jack_client_t * jack_client_open (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status, ...);
-    LIB_EXPORT int jack_client_close (jack_client_t *client);
-    LIB_EXPORT int jack_get_client_pid (const char *name);
+    Jack_API_EXPORT jack_client_t * jack_client_open (const char *client_name,
+                                                      jack_options_t options,
+                                                      jack_status_t *status, ...);
+    Jack_API_EXPORT int jack_client_close (jack_client_t *client);
+    Jack_API_EXPORT int jack_get_client_pid (const char *name);
 
-    LIB_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t subject, const char* key, const char* value, const char* type);
-    LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type);
-    LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_description_itself);
-    LIB_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc);
-    LIB_EXPORT int jack_get_all_properties(jack_description_t** descs);
-    LIB_EXPORT int jack_remove_property(jack_client_t* client, jack_uuid_t subject, const char* key);
-    LIB_EXPORT int jack_remove_properties(jack_client_t* client, jack_uuid_t subject);
-    LIB_EXPORT int jack_remove_all_properties(jack_client_t* client);
-    LIB_EXPORT int jack_set_property_change_callback(jack_client_t* client, JackPropertyChangeCallback callback, void* arg);
+    Jack_API_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t subject, const char* key, const char* value, const char* type);
+    Jack_API_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type);
+    Jack_API_EXPORT void jack_free_description(jack_description_t* desc, int free_description_itself);
+    Jack_API_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc);
+    Jack_API_EXPORT int jack_get_all_properties(jack_description_t** descs);
+    Jack_API_EXPORT int jack_remove_property(jack_client_t* client, jack_uuid_t subject, const char* key);
+    Jack_API_EXPORT int jack_remove_properties(jack_client_t* client, jack_uuid_t subject);
+    Jack_API_EXPORT int jack_remove_all_properties(jack_client_t* client);
+    Jack_API_EXPORT int jack_set_property_change_callback(jack_client_t* client, JackPropertyChangeCallback callback, void* arg);
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 static jack_client_t * jack_client_open_aux (const char *client_name,
@@ -174,7 +176,7 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
     }
 }
 
-LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+Jack_API_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
     JackGlobals::CheckContext("jack_client_open");
 
@@ -196,7 +198,7 @@ LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_opt
     }
 }
 
-LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
+Jack_API_EXPORT int jack_client_close(jack_client_t* ext_client)
 {
     JackGlobals::CheckContext("jack_client_close");
 
@@ -217,7 +219,7 @@ LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
     return res;
 }
 
-LIB_EXPORT int jack_get_client_pid(const char *name)
+Jack_API_EXPORT int jack_get_client_pid(const char *name)
 {
     jack_error("jack_get_client_pid : not implemented on library side");
     return 0;
@@ -225,7 +227,7 @@ LIB_EXPORT int jack_get_client_pid(const char *name)
 
 // Metadata API
 
-LIB_EXPORT int jack_set_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key, const char* value, const char* type)
+Jack_API_EXPORT int jack_set_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key, const char* value, const char* type)
 {
     JackGlobals::CheckContext("jack_set_property");
 
@@ -240,7 +242,7 @@ LIB_EXPORT int jack_set_property(jack_client_t* ext_client, jack_uuid_t subject,
     }
 }
 
-LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type)
+Jack_API_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type)
 {
     JackGlobals::CheckContext("jack_get_property");
 
@@ -248,7 +250,7 @@ LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** va
     return (metadata ? metadata->GetProperty(subject, key, value, type) : -1);
 }
 
-LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_actual_description_too)
+Jack_API_EXPORT void jack_free_description(jack_description_t* desc, int free_actual_description_too)
 {
     JackGlobals::CheckContext("jack_free_description");
 
@@ -257,7 +259,7 @@ LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_actual_
         metadata->FreeDescription(desc, free_actual_description_too);
 }
 
-LIB_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc)
+Jack_API_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc)
 {
     JackGlobals::CheckContext("jack_get_properties");
 
@@ -265,7 +267,7 @@ LIB_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc
     return (metadata ? metadata->GetProperties(subject, desc) : -1);
 }
 
-LIB_EXPORT int jack_get_all_properties(jack_description_t** descriptions)
+Jack_API_EXPORT int jack_get_all_properties(jack_description_t** descriptions)
 {
     JackGlobals::CheckContext("jack_get_all_properties");
 
@@ -273,7 +275,7 @@ LIB_EXPORT int jack_get_all_properties(jack_description_t** descriptions)
     return (metadata ? metadata->GetAllProperties(descriptions) : -1);
 }
 
-LIB_EXPORT int jack_remove_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key)
+Jack_API_EXPORT int jack_remove_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key)
 {
     JackGlobals::CheckContext("jack_remove_property");
 
@@ -288,7 +290,7 @@ LIB_EXPORT int jack_remove_property(jack_client_t* ext_client, jack_uuid_t subje
     }
 }
 
-LIB_EXPORT int jack_remove_properties(jack_client_t* ext_client, jack_uuid_t subject)
+Jack_API_EXPORT int jack_remove_properties(jack_client_t* ext_client, jack_uuid_t subject)
 {
     JackGlobals::CheckContext("jack_remove_properties");
 
@@ -303,7 +305,7 @@ LIB_EXPORT int jack_remove_properties(jack_client_t* ext_client, jack_uuid_t sub
     }
 }
 
-LIB_EXPORT int jack_remove_all_properties(jack_client_t* ext_client)
+Jack_API_EXPORT int jack_remove_all_properties(jack_client_t* ext_client)
 {
     JackGlobals::CheckContext("jack_remove_all_properties");
 
@@ -318,7 +320,7 @@ LIB_EXPORT int jack_remove_all_properties(jack_client_t* ext_client)
     }
 }
 
-LIB_EXPORT int jack_set_property_change_callback(jack_client_t* ext_client, JackPropertyChangeCallback callback, void* arg)
+Jack_API_EXPORT int jack_set_property_change_callback(jack_client_t* ext_client, JackPropertyChangeCallback callback, void* arg)
 {
     JackGlobals::CheckContext("jack_set_property_change_callback");
 

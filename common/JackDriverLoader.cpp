@@ -261,7 +261,7 @@ int jack_parse_driver_params(jack_driver_desc_t* desc, int argc, char* argv[], J
     return 0;
 }
 
-SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver *driver_ptr, int argc, char* argv[])
+int jackctl_driver_params_parse(jackctl_driver *driver_ptr, int argc, char* argv[])
 {
     struct option* long_options;
     char* options, * options_ptr;
@@ -780,7 +780,7 @@ JackDriverInfo::~JackDriverInfo()
     }
 }
 
-SERVER_EXPORT jack_driver_desc_t* jack_driver_descriptor_construct(
+jack_driver_desc_t* jack_driver_descriptor_construct(
     const char * name,
     jack_driver_type_t type,
     const char * description,
@@ -818,7 +818,7 @@ SERVER_EXPORT jack_driver_desc_t* jack_driver_descriptor_construct(
     return desc_ptr;
 }
 
-SERVER_EXPORT int jack_driver_descriptor_add_parameter(
+int jack_driver_descriptor_add_parameter(
     jack_driver_desc_t* desc_ptr,
     jack_driver_desc_filler_t * filler_ptr,
     const char* name,
@@ -878,7 +878,6 @@ SERVER_EXPORT int jack_driver_descriptor_add_parameter(
     return true;
 }
 
-SERVER_EXPORT
 int
 jack_constraint_add_enum(
     jack_driver_param_constraint_desc_t ** constraint_ptr_ptr,
@@ -946,7 +945,6 @@ jack_constraint_add_enum(
     return true;
 }
 
-SERVER_EXPORT
 void
 jack_constraint_free(
     jack_driver_param_constraint_desc_t * constraint_ptr)

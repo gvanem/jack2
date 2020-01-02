@@ -23,7 +23,7 @@
 namespace Jack
 {
     //utility *********************************************************************************************************
-    SERVER_EXPORT int GetHostName(char * name, int size)
+    int GetHostName(char * name, int size)
     {
         if (gethostname(name, size) == SOCKET_ERROR) {
             jack_error("Can't get 'hostname' : %s", strerror(NET_ERROR_CODE));
@@ -88,7 +88,7 @@ namespace Jack
         { -1, NULL },
     };
 
-    SERVER_EXPORT const char* PrintError(int error)
+    const char* PrintError(int error)
     {
         int i;
         for (i = 0; NetErrorList[i].code >= 0; ++i) {

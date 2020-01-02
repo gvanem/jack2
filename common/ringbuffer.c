@@ -26,6 +26,9 @@
 #include <sys/mman.h>
 #endif /* USE_MLOCK */
 #include "JackCompilerDeps.h"
+#include "jack/ringbuffer.h"
+
+#if 0 /* WTF is this here? */
 
 typedef struct {
     char *buf;
@@ -43,28 +46,30 @@ typedef struct {
 }
 jack_ringbuffer_t ;
 
-LIB_EXPORT jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
-LIB_EXPORT void jack_ringbuffer_free(jack_ringbuffer_t *rb);
-LIB_EXPORT void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
+jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
+void jack_ringbuffer_free(jack_ringbuffer_t *rb);
+void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
                                          jack_ringbuffer_data_t *vec);
-LIB_EXPORT void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
+void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
                                           jack_ringbuffer_data_t *vec);
-LIB_EXPORT size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
-LIB_EXPORT size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
-LIB_EXPORT void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
-LIB_EXPORT size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
-LIB_EXPORT int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
-LIB_EXPORT void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
-LIB_EXPORT void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
-LIB_EXPORT size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
+size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
+size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
+void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
+size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
+int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
+void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
+void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
+size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
                                  size_t cnt);
 void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
 size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
 
+#endif
+
 /* Create a new ringbuffer to hold at least `sz' bytes of data. The
    actual buffer size is rounded up to the next power of two.  */
 
-LIB_EXPORT jack_ringbuffer_t *
+jack_ringbuffer_t *
 jack_ringbuffer_create (size_t sz)
 {
 	int power_of_two;
@@ -92,7 +97,7 @@ jack_ringbuffer_create (size_t sz)
 
 /* Free all data associated with the ringbuffer `rb'. */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_free (jack_ringbuffer_t * rb)
 {
 #ifdef USE_MLOCK
@@ -106,7 +111,7 @@ jack_ringbuffer_free (jack_ringbuffer_t * rb)
 
 /* Lock the data block of `rb' using the system call 'mlock'.  */
 
-LIB_EXPORT int
+int
 jack_ringbuffer_mlock (jack_ringbuffer_t * rb)
 {
 #ifdef USE_MLOCK
@@ -121,7 +126,7 @@ jack_ringbuffer_mlock (jack_ringbuffer_t * rb)
 /* Reset the read and write pointers to zero. This is not thread
    safe. */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 {
 	rb->read_ptr = 0;
@@ -132,7 +137,7 @@ jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 /* Reset the read and write pointers to zero. This is not thread
    safe. */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz)
 {
     rb->size = sz;
@@ -146,7 +151,7 @@ jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz)
    number of bytes in front of the read pointer and behind the write
    pointer.  */
 
-LIB_EXPORT size_t
+size_t
 jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
 {
 	size_t w, r;
@@ -165,7 +170,7 @@ jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
    number of bytes in front of the write pointer and behind the read
    pointer.  */
 
-LIB_EXPORT size_t
+size_t
 jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 {
 	size_t w, r;
@@ -185,7 +190,7 @@ jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 /* The copying data reader.  Copy at most `cnt' bytes from `rb' to
    `dest'.  Returns the actual number of bytes copied. */
 
-LIB_EXPORT size_t
+size_t
 jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 {
 	size_t free_cnt;
@@ -224,7 +229,7 @@ jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
    `cnt' bytes from `rb' to `dest'.  Returns the actual number of bytes
    copied. */
 
-LIB_EXPORT size_t
+size_t
 jack_ringbuffer_peek (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 {
 	size_t free_cnt;
@@ -264,7 +269,7 @@ jack_ringbuffer_peek (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 /* The copying data writer.  Copy at most `cnt' bytes to `rb' from
    `src'.  Returns the actual number of bytes copied. */
 
-LIB_EXPORT size_t
+size_t
 jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 {
 	size_t free_cnt;
@@ -301,7 +306,7 @@ jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 
 /* Advance the read pointer `cnt' places. */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
 	size_t tmp = (rb->read_ptr + cnt) & rb->size_mask;
@@ -310,7 +315,7 @@ jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 
 /* Advance the write pointer `cnt' places. */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_write_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
 	size_t tmp = (rb->write_ptr + cnt) & rb->size_mask;
@@ -322,7 +327,7 @@ jack_ringbuffer_write_advance (jack_ringbuffer_t * rb, size_t cnt)
    the readable data is in one segment the second segment has zero
    length.  */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_get_read_vector (const jack_ringbuffer_t * rb,
 				 jack_ringbuffer_data_t * vec)
 {
@@ -366,7 +371,7 @@ jack_ringbuffer_get_read_vector (const jack_ringbuffer_t * rb,
    the writeable data is in one segment the second segment has zero
    length.  */
 
-LIB_EXPORT void
+void
 jack_ringbuffer_get_write_vector (const jack_ringbuffer_t * rb,
 				  jack_ringbuffer_data_t * vec)
 {

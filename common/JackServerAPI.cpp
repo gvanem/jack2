@@ -28,21 +28,25 @@ This program is free software; you can redistribute it and/or modify
 #include "JackCompilerDeps.h"
 #include "JackLockedEngine.h"
 
+#if 0
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status);
+    JackServer_API_EXPORT jack_client_t* jack_client_new_aux (const char* client_name,
+                                                              jack_options_t options,
+                                                              jack_status_t* status);
 
-    SERVER_EXPORT jack_client_t * jack_client_open (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status, ...);
-    SERVER_EXPORT int jack_client_close (jack_client_t *client);
-    SERVER_EXPORT int jack_get_client_pid (const char *name);
+    JackServer_API_EXPORT jack_client_t * jack_client_open (const char *client_name,
+                                                            jack_options_t options,
+                                                            jack_status_t *status, ...);
+    JackServer_API_EXPORT int jack_client_close (jack_client_t *client);
+    JackServer_API_EXPORT int jack_get_client_pid (const char *name);
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 using namespace Jack;
@@ -149,7 +153,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     }
 }
 
-SERVER_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
     JackGlobals::CheckContext("jack_client_open");
 
@@ -171,7 +175,7 @@ SERVER_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_
     }
 }
 
-SERVER_EXPORT int jack_client_close(jack_client_t* ext_client)
+int jack_client_close(jack_client_t* ext_client)
 {
     JackGlobals::CheckContext("jack_client_close");
 
@@ -192,7 +196,7 @@ SERVER_EXPORT int jack_client_close(jack_client_t* ext_client)
     return res;
 }
 
-SERVER_EXPORT int jack_get_client_pid(const char *name)
+int jack_get_client_pid(const char *name)
 {
     return (JackServerGlobals::fInstance != NULL)
         ? JackServerGlobals::fInstance->GetEngine()->GetClientPID(name)

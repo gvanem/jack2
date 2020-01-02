@@ -255,7 +255,7 @@ void JackWinThread::Terminate()
     ExitThread(0);
 }
 
-SERVER_EXPORT void ThreadExit()
+void ThreadExit()
 {
     jack_log("ThreadExit");
     ExitThread(0);

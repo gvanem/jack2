@@ -62,7 +62,7 @@ namespace Jack
         for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
             fMidiPlaybackPorts[port_index] = NULL;
         }
-    
+
         //monitor
 #ifdef JACK_MONITOR
         fPeriodUsecs = (int)(1000000.f * ((float) fParams.fPeriodSize / (float) fParams.fSampleRate));
@@ -127,7 +127,7 @@ namespace Jack
             jack_error("Can't open a new JACK client");
             return false;
         }
-        
+
         if (jack_set_process_callback(fClient, SetProcess, this) < 0) {
             goto fail;
         }
@@ -135,21 +135,21 @@ namespace Jack
         if (jack_set_buffer_size_callback(fClient, SetBufferSize, this) < 0) {
             goto fail;
         }
-        
+
         if (jack_set_sample_rate_callback(fClient, SetSampleRate, this) < 0) {
             goto fail;
         }
-        
+
         if (jack_set_latency_callback(fClient, LatencyCallback, this) < 0) {
             goto fail;
         }
-        
+
         /*
         if (jack_set_port_connect_callback(fClient, SetConnectCallback, this) < 0) {
             goto fail;
         }
         */
-     
+
         if (AllocPorts() != 0) {
             jack_error("Can't allocate JACK ports");
             goto fail;
@@ -379,7 +379,7 @@ namespace Jack
         }
         return 0;
     }
-    
+
     int JackNetMaster::SetSampleRate(jack_nframes_t nframes, void* arg)
     {
         JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
@@ -389,34 +389,34 @@ namespace Jack
         }
         return 0;
     }
-    
+
     void JackNetMaster::LatencyCallback(jack_latency_callback_mode_t mode, void* arg)
     {
         JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
         jack_nframes_t port_latency = jack_get_buffer_size(obj->fClient);
         jack_latency_range_t range;
-        
+
         //audio
         for (int i = 0; i < obj->fParams.fSendAudioChannels; i++) {
             //port latency
             range.min = range.max = float(obj->fParams.fNetworkLatency * port_latency) / 2.f;
             jack_port_set_latency_range(obj->fAudioCapturePorts[i], JackPlaybackLatency, &range);
         }
-        
+
         //audio
         for (int i = 0; i < obj->fParams.fReturnAudioChannels; i++) {
             //port latency
             range.min = range.max = float(obj->fParams.fNetworkLatency * port_latency) / 2.f + ((obj->fParams.fSlaveSyncMode) ? 0 : port_latency);
             jack_port_set_latency_range(obj->fAudioPlaybackPorts[i], JackCaptureLatency, &range);
         }
-        
+
         //midi
         for (int i = 0; i < obj->fParams.fSendMidiChannels; i++) {
             //port latency
             range.min = range.max = float(obj->fParams.fNetworkLatency * port_latency) / 2.f;
             jack_port_set_latency_range(obj->fMidiCapturePorts[i], JackPlaybackLatency, &range);
         }
-    
+
         //midi
         for (int i = 0; i < obj->fParams.fReturnMidiChannels; i++) {
             //port latency
@@ -434,12 +434,12 @@ namespace Jack
             return 0;
         }
     }
-    
+
     void JackNetMaster::SetConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
     {
         static_cast<JackNetMaster*>(arg)->ConnectCallback(a, b, connect);
     }
-    
+
     void JackNetMaster::ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect)
     {
         jack_info("JackNetMaster::ConnectCallback a = %d b = %d connect = %d", a, b, connect);
@@ -532,15 +532,15 @@ namespace Jack
         // receive sync
         int res = SyncRecv();
         switch (res) {
-        
+
             case NET_SYNCHING:
             case SOCKET_ERROR:
                 return res;
-                
+
             case SYNC_PACKET_ERROR:
                  // Since sync packet is incorrect, don't decode it and continue with data
                  break;
-                
+
             default:
                 // Decode sync
                 int unused_frames;
@@ -551,15 +551,15 @@ namespace Jack
 #ifdef JACK_MONITOR
         fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
 #endif
-      
+
         // receive data
         res = DataRecv();
         switch (res) {
-        
+
             case 0:
             case SOCKET_ERROR:
                 return res;
-                
+
             case DATA_PACKET_ERROR:
                 // Well not a real XRun...
                 JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
@@ -571,7 +571,7 @@ namespace Jack
 #endif
         return 0;
     }
-    
+
     void JackNetMaster::SaveConnections(connections_list_t& connections)
     {
         // Audio
@@ -585,7 +585,7 @@ namespace Jack
                 jack_free(connected_port);
             }
         }
-   
+
         for (int i = 0; i < fParams.fReturnAudioChannels; i++) {
             const char** connected_port = jack_port_get_all_connections(fClient, fAudioPlaybackPorts[i]);
             if (connected_port != NULL) {
@@ -596,7 +596,7 @@ namespace Jack
                 jack_free(connected_port);
             }
         }
-        
+
         // MIDI
         for (int i = 0; i < fParams.fSendMidiChannels; i++) {
             const char** connected_port = jack_port_get_all_connections(fClient, fMidiCapturePorts[i]);
@@ -608,7 +608,7 @@ namespace Jack
                 jack_free(connected_port);
             }
         }
-   
+
         for (int i = 0; i < fParams.fReturnMidiChannels; i++) {
             const char** connected_port = jack_port_get_all_connections(fClient, fMidiPlaybackPorts[i]);
             if (connected_port != NULL) {
@@ -620,7 +620,7 @@ namespace Jack
             }
         }
     }
-    
+
     void JackNetMaster::LoadConnections(const connections_list_t& connections)
     {
         list<pair<string, string> >::const_iterator it;
@@ -646,9 +646,9 @@ namespace Jack
 
         const JSList* node;
         const jack_driver_param_t* param;
-     
+
         jack_on_shutdown(fClient, SetShutDown, this);
-    
+
         // Possibly use env variable
         const char* default_udp_port = getenv("JACK_NETJACK_PORT");
         fSocket.SetPort((default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT);
@@ -679,7 +679,7 @@ namespace Jack
                 case 'c':
                     fAutoConnect = true;
                     break;
-                    
+
                 case 's':
                     fAutoSave = true;
                     break;
@@ -716,12 +716,12 @@ namespace Jack
         }
         return count;
     }
-    
+
     void JackNetMasterManager::SetShutDown(void* arg)
     {
         static_cast<JackNetMasterManager*>(arg)->ShutDown();
     }
-    
+
     void JackNetMasterManager::ShutDown()
     {
         jack_log("JackNetMasterManager::ShutDown");
@@ -817,7 +817,7 @@ namespace Jack
             session_params_t net_params;
             rx_bytes = fSocket.CatchHost(&net_params, sizeof(session_params_t), 0);
             SessionParamsNToH(&net_params, &host_params);
-            
+
             if ((rx_bytes == SOCKET_ERROR) && (fSocket.GetError() != NET_NO_DATA)) {
                 jack_error("Error in receive : %s", StrError(NET_ERROR_CODE));
                 if (++attempt == 10) {
@@ -875,7 +875,7 @@ namespace Jack
             params.fReturnAudioChannels = CountIO(JACK_DEFAULT_AUDIO_TYPE, JackPortIsPhysical | JackPortIsInput);
             jack_info("Takes physical %d audio output(s) for slave", params.fReturnAudioChannels);
         }
-        
+
         if (params.fSendMidiChannels == -1) {
             params.fSendMidiChannels = CountIO(JACK_DEFAULT_MIDI_TYPE, JackPortIsPhysical | JackPortIsOutput);
             jack_info("Takes physical %d MIDI input(s) for slave", params.fSendMidiChannels);
@@ -938,7 +938,7 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
+    jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t * desc;
         jack_driver_desc_filler_t filler;
@@ -961,7 +961,7 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
+    int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
     {
         if (master_manager) {
             jack_error("Master Manager already loaded");
@@ -973,7 +973,7 @@ extern "C"
         }
     }
 
-    SERVER_EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
+    int jack_initialize(jack_client_t* jack_client, const char* load_init)
     {
         JSList* params = NULL;
         bool parse_params = true;
@@ -992,7 +992,7 @@ extern "C"
         return res;
     }
 
-    SERVER_EXPORT void jack_finish(void* arg)
+    void jack_finish(void* arg)
     {
         if (master_manager) {
             jack_log("Unloading Master Manager");

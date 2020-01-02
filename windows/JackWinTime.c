@@ -23,12 +23,12 @@
 static LARGE_INTEGER _jack_freq;
 static UINT gPeriod = 0;
 
-SERVER_EXPORT void JackSleep(long usec)
+void JackSleep(long usec)
 {
 	Sleep(usec / 1000);
 }
 
-SERVER_EXPORT void InitTime()
+void InitTime()
 {
     TIMECAPS caps;
 
@@ -46,14 +46,14 @@ SERVER_EXPORT void InitTime()
     }
 }
 
-SERVER_EXPORT void EndTime()
+void EndTime()
 {
     if (gPeriod > 0) {
         timeEndPeriod(gPeriod);
     }
 }
 
-SERVER_EXPORT jack_time_t GetMicroSeconds(void)
+jack_time_t GetMicroSeconds(void)
 {
 	LARGE_INTEGER t1;
 	QueryPerformanceCounter(&t1);

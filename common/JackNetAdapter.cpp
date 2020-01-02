@@ -52,7 +52,7 @@ namespace Jack
         fParams.fNetworkLatency = NETWORK_DEFAULT_LATENCY;
         fParams.fSampleEncoder = JackFloatEncoder;
         fClient = jack_client;
-    
+
         // Possibly use env variable
         const char* default_udp_port = getenv("JACK_NETJACK_PORT");
         udp_port = (default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT;
@@ -351,21 +351,21 @@ namespace Jack
     int JackNetAdapter::Read()
     {
         switch (SyncRecv()) {
-        
+
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
-                
+
             case SYNC_PACKET_ERROR:
                 // Since sync packet is incorrect, don't decode it and continue with data
                 break;
-                
+
             default:
                 //decode sync
                 int unused_frames;
                 DecodeSyncPacket(unused_frames);
                 break;
         }
-        
+
         return DataRecv();
     }
 
@@ -413,7 +413,7 @@ extern "C"
 
     using namespace Jack;
 
-    SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
+    jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t * desc;
         jack_driver_desc_filler_t filler;
@@ -465,7 +465,7 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT int jack_internal_initialize(jack_client_t* client, const JSList* params)
+    int jack_internal_initialize(jack_client_t* client, const JSList* params)
     {
         jack_log("Loading netadapter");
 
@@ -491,7 +491,7 @@ extern "C"
         }
     }
 
-    SERVER_EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
+    int jack_initialize(jack_client_t* jack_client, const char* load_init)
     {
         JSList* params = NULL;
         bool parse_params = true;
@@ -510,7 +510,7 @@ extern "C"
         return res;
     }
 
-    SERVER_EXPORT void jack_finish(void* arg)
+    void jack_finish(void* arg)
     {
         Jack::JackAudioAdapter* adapter = static_cast<Jack::JackAudioAdapter*>(arg);
 
