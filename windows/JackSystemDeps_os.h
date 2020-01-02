@@ -65,6 +65,9 @@ inline int fake_putenv_s (const char *name, const char *value)
   return (0);
 }
 
+#undef  _putenv_s
+#define _putenv_s(name, value) fake_putenv_s (name, value)
+
 inline int setenv(const char* name, const char* value, int overwrite)
 {
 	if (overwrite == 0 && getenv(name) != NULL) {
