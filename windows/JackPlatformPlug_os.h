@@ -23,8 +23,14 @@
 
 #define jack_server_dir "server"
 #define jack_client_dir "client"
-#define JACK_DEFAULT_DRIVER "portaudio"
-#define JACK_LOCATION "C:/Program Files/Jack"
+
+#ifndef JACK_DEFAULT_DRIVER
+    #define JACK_DEFAULT_DRIVER "portaudio"
+#endif
+
+#ifndef JACK_LOCATION
+    #define JACK_LOCATION "C:/Program Files/Jack"
+#endif
 
 #ifndef ADDON_DIR
     #define ADDON_DIR "jack"
