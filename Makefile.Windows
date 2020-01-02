@@ -135,9 +135,10 @@ else ifeq ($(CC),cl)
   CFLAGS += -wd4005 -wd4200 -wd4244 -wd4101 -wd4251 -wd4275 -wd4521 -wd4522
 
 else ifeq ($(CC),gcc)
-  CFLAGS += -fmax-errors=5       \
-            -Wno-unused-variable \
-            -Wno-unused-but-set-variable
+  CFLAGS += -fmax-errors=5               \
+            -Wno-unused-variable         \
+            -Wno-unused-but-set-variable \
+            -Wno-deprecated-declarations
 endif
 
 CFLAGS += -I.               \
@@ -818,10 +819,18 @@ define win32_config_H
     // #define _STDINT_H           1
 
     /*
-     * Some MinGWs have problems with seeing this in C++ mode?!
+     * Some old MinGWs (used by AppVeyor) does not have '_putenv_s()'
      */
-    #ifdef __cplusplus
-      extern "C" __declspec(dllimport) errno_t __cdecl _putenv_s (const char *_Name,const char *_Value);
+    #if defined(__MINGW32__) // && (__MINGW32_VERSION <= 3021000L)
+      static inline int fake_putenv_s (const char *name, const char *value)
+      {
+        char sum [1000];
+
+        _snprintf (sum, sizeof(sum), "%s=%s", name, value);
+        putenv (sum);
+        return (0);
+      }
+      #define _putenv_s(name, value) fake_putenv_s (name, value)
     #endif
   #endif
 
