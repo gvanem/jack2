@@ -4,6 +4,12 @@
 .. image:: https://travis-ci.org/jackaudio/jack2.svg?branch=master
    :target: https://travis-ci.org/jackaudio/jack2
 
+My fork aims to get Jack2 compiled using MSVC and/or clang-cl.
+The main differences are mostly related to the horrid `LIB_EXPORT` anf
+`SERVER_EXPORT` stuff. All these `dllexport` and `dllimport` decorations
+are now in a new file [`common/jack/export.h`](common/jack/export.h).
+
+
 JACK2 aka jackdmp is a C++ version of the JACK low-latency audio server for
 multi-processor machines. It is a new implementation of the JACK server core
 features that aims at removing some limitations of the JACK1 design. The
@@ -33,4 +39,3 @@ and robust system.
     stream will still be produced (even if its partial in some way). This
     mode usually result in fewer (less audible) audio glitches in a loaded
     system.
-
