@@ -53,7 +53,7 @@ inline int snprintf(char* buf, size_t buf_len, const char* fmt, ...)
 	va_end(args);
 	return str_len;
 }
-#endif
-#endif
+#endif  /* _MSC_VER < 1900 */
+#endif  /* _MSC_VER */
 
 #endif
