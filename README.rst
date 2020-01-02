@@ -4,6 +4,9 @@
 .. image:: https://travis-ci.org/jackaudio/jack2.svg?branch=master
    :target: https://travis-ci.org/jackaudio/jack2
 
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/gvanem/Jack2?branch=master&svg=true)](https://ci.appveyor.com/project/gvanem/Jack2)
+
+
 My fork aims to get Jack2 compiled using MSVC and/or clang-cl.
 The main differences are mostly related to the horrid `LIB_EXPORT` anf
 `SERVER_EXPORT` stuff. All these `dllexport` and `dllimport` decorations
