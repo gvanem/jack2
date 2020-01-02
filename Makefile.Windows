@@ -80,11 +80,11 @@ ifeq ($(CC),gcc)
   #
   # These are all static libraries:
   #
-  CELT_LIB       = $(CELT_ROOT)/libcelt.a
-  REGEX_LIB      = $(REGEX_ROOT)/libregex.a
-  SAMPLERATE_LIB = $(LIBSAMPLERATE_ROOT)/libsamplerate-0.a
-  PORTAUDIO_LIB  = $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
-  PTHREADS_LIB   = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
+  CELT_LIB        = $(CELT_ROOT)/libcelt.a
+  REGEX_LIB       = $(REGEX_ROOT)/libregex.a
+  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/../libsamplerate-0.a
+  PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
+  PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
 
 else
   #
@@ -100,11 +100,11 @@ else
   #
   # These are all static libraries:
   #
-  CELT_LIB       = $(CELT_ROOT)/celt.lib
-  REGEX_LIB      = $(REGEX_ROOT)/regex.lib
-  SAMPLERATE_LIB = $(LIBSAMPLERATE_ROOT)/libsamplerate-0.lib
-  PORTAUDIO_LIB  = $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
-  PTHREADS_LIB   = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
+  CELT_LIB        = $(CELT_ROOT)/celt.lib
+  REGEX_LIB       = $(REGEX_ROOT)/regex.lib
+  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/../libsamplerate-0.lib
+  PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
+  PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
 endif
 
 #
