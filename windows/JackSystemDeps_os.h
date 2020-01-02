@@ -17,10 +17,10 @@
 
  */
 
-
 #ifndef __JackSystemDeps_WIN32__
 #define __JackSystemDeps_WIN32__
 
+#include <stdlib.h>
 #include <windows.h>
 #include "JackCompilerDeps.h"
 
@@ -32,15 +32,15 @@
 #define UINT32_MAX 4294967295U
 #endif
 
-#define DRIVER_HANDLE HINSTANCE
-#define LoadDriverModule(name) LoadLibrary((name))
-#define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
+#define DRIVER_HANDLE               HINSTANCE
+#define LoadDriverModule(name)      LoadLibrary((name))
+#define UnloadDriverModule(handle)  (FreeLibrary(((HMODULE)handle)))
 #define GetDriverProc(handle, name) GetProcAddress(((HMODULE)handle), (name))
 
-#define JACK_HANDLE HINSTANCE
-#define LoadJackModule(name) LoadLibrary((name));
-#define UnloadJackModule(handle) FreeLibrary((handle));
-#define GetJackProc(handle, name) GetProcAddress((handle), (name));
+#define JACK_HANDLE                 HINSTANCE
+#define LoadJackModule(name)        LoadLibrary((name));
+#define UnloadJackModule(handle)    FreeLibrary((handle));
+#define GetJackProc(handle, name)   GetProcAddress((handle), (name));
 
 #ifndef ENOBUFS
 #define ENOBUFS 55
@@ -51,6 +51,19 @@
 #else
 #define JACK_DEBUG false
 #endif
+
+/*
+ * Some old MinGWs (used by AppVeyor) does not have '_putenv_s()'.
+ * So just fake it.
+ */
+inline int fake_putenv_s (const char *name, const char *value)
+{
+  char sum [1000];
+
+  _snprintf (sum, sizeof(sum), "%s=%s", name, value);
+  _putenv (sum);
+  return (0);
+}
 
 inline int setenv(const char* name, const char* value, int overwrite)
 {
@@ -64,6 +77,5 @@ inline int unsetenv(const char* name)
 {
 	return _putenv_s(name, "");
 }
-
 #endif
 
