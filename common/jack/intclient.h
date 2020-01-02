@@ -1,18 +1,18 @@
 /*
 *  Copyright (C) 2004 Jack O'Quin
-*  
+*
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU Lesser General Public License as published by
 *  the Free Software Foundation; either version 2.1 of the License, or
 *  (at your option) any later version.
-*  
+*
 *  This program is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *  GNU Lesser General Public License for more details.
-*  
+*
 *  You should have received a copy of the GNU Lesser General Public License
-*  along with this program; if not, write to the Free Software 
+*  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *
 */
@@ -26,6 +26,7 @@ extern "C"
 #endif
 
 #include <jack/types.h>
+#include <jack/export.h>
 
 /**
  * Get an internal client's name.  This is useful when @ref
@@ -42,6 +43,7 @@ extern "C"
  * client name obtained from the heap via malloc().  The caller should
  * jack_free() this storage when no longer needed.
  */
+Jack_API_EXPORT
 char *jack_get_internal_client_name (jack_client_t *client,
                                      jack_intclient_t intclient);
 
@@ -63,9 +65,10 @@ char *jack_get_internal_client_name (jack_client_t *client,
  * internal client was not found, and @a *status includes the @ref
  * JackNoSuchClient and @ref JackFailure bits.
  */
+Jack_API_EXPORT
 jack_intclient_t jack_internal_client_handle (jack_client_t *client,
-        const char *client_name,
-        jack_status_t *status);
+                                              const char *client_name,
+                                              jack_status_t *status);
 
 /**
  * Load an internal client into the JACK server.
@@ -104,10 +107,12 @@ jack_intclient_t jack_internal_client_handle (jack_client_t *client,
  * the load operation failed, the internal client was not loaded, and
  * @a *status includes the @ref JackFailure bit.
  */
+Jack_API_EXPORT
 jack_intclient_t jack_internal_client_load (jack_client_t *client,
-        const char *client_name,
-        jack_options_t options,
-        jack_status_t *status, ...);
+                                            const char *client_name,
+                                            jack_options_t options,
+                                            jack_status_t *status, ...);
+
 /**
  * Unload an internal client from a JACK server.  This calls the
  * intclient's jack_finish() entry point then removes it.  See @ref
@@ -120,8 +125,9 @@ jack_intclient_t jack_internal_client_load (jack_client_t *client,
  *
  * @return 0 if successful, otherwise @ref JackStatus bits.
  */
+Jack_API_EXPORT
 jack_status_t jack_internal_client_unload (jack_client_t *client,
-        jack_intclient_t intclient);
+                                           jack_intclient_t intclient);
 
 #ifdef __cplusplus
 }

@@ -28,7 +28,7 @@
 namespace Jack
 {
 
-class JackWinNamedPipeAux
+class Jack_API_EXPORT JackWinNamedPipeAux
 {
 
     protected:
@@ -51,7 +51,7 @@ class JackWinNamedPipeAux
 };
 
 
-class JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelTransactionInterface
+class Jack_API_EXPORT JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelTransactionInterface
 {
 
     public:
@@ -77,7 +77,7 @@ class JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelT
 \brief Client named pipe.
 */
 
-class JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackClientRequestInterface
+class Jack_API_EXPORT JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackClientRequestInterface
 {
 
     protected:
@@ -111,11 +111,11 @@ class JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackCl
 
         virtual void SetReadTimeOut(long sec);
         virtual void SetWriteTimeOut(long sec);
-        
+
         virtual void SetNonBlocking(bool onoff);
 };
 
-class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
+class Jack_API_EXPORT JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
 {
         enum kIOState {kIdle = 0, kConnecting, kReading, kWriting};
 
@@ -156,7 +156,7 @@ class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
 \brief Server named pipe.
 */
 
-class JackWinNamedPipeServer : public JackWinNamedPipe
+class Jack_API_EXPORT JackWinNamedPipeServer : public JackWinNamedPipe
 {
     private:
 
@@ -180,7 +180,7 @@ class JackWinNamedPipeServer : public JackWinNamedPipe
 \brief Server async named pipe.
 */
 
-class JackWinAsyncNamedPipeServer : public JackWinNamedPipeServer
+class Jack_API_EXPORT JackWinAsyncNamedPipeServer : public JackWinNamedPipeServer
 {
 
     private:

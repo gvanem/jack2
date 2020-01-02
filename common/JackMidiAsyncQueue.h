@@ -37,7 +37,7 @@ namespace Jack {
      * thread copies events from a MIDI buffer to this queue, or vice versa.
      */
 
-    class SERVER_EXPORT JackMidiAsyncQueue:
+    class Jack_API_EXPORT JackMidiAsyncQueue:
         public JackMidiReadQueue, public JackMidiWriteQueue {
 
     private:

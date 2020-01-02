@@ -33,7 +33,7 @@ namespace Jack {
      * MIDI bytes that must be parsed.
      */
 
-    class SERVER_EXPORT JackMidiRawInputWriteQueue: public JackMidiWriteQueue {
+    class Jack_API_EXPORT JackMidiRawInputWriteQueue: public JackMidiWriteQueue {
 
     private:
 

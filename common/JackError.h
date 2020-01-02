@@ -31,25 +31,25 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT void jack_error(const char *fmt, ...);
-    SERVER_EXPORT void jack_info(const char *fmt, ...);
-    SERVER_EXPORT void jack_log(const char *fmt, ...);
+    Jack_API_EXPORT void jack_error(const char *fmt, ...);
+    Jack_API_EXPORT void jack_info(const char *fmt, ...);
+    Jack_API_EXPORT void jack_log(const char *fmt, ...);
 
-    SERVER_EXPORT extern void (*jack_error_callback)(const char *desc);
-    SERVER_EXPORT extern void (*jack_info_callback)(const char *desc);
+    Jack_API_EXPORT extern void (*jack_error_callback)(const char *desc);
+    Jack_API_EXPORT extern void (*jack_info_callback)(const char *desc);
 
-    SERVER_EXPORT extern void default_jack_error_callback(const char *desc);
-    SERVER_EXPORT extern void default_jack_info_callback(const char *desc);
+    Jack_API_EXPORT void default_jack_error_callback(const char *desc);
+    Jack_API_EXPORT void default_jack_info_callback(const char *desc);
 
-    SERVER_EXPORT void silent_jack_error_callback(const char *desc);
-    SERVER_EXPORT void silent_jack_info_callback(const char *desc);
+    Jack_API_EXPORT void silent_jack_error_callback(const char *desc);
+    Jack_API_EXPORT void silent_jack_info_callback(const char *desc);
 
-    SERVER_EXPORT int set_threaded_log_function();
+    Jack_API_EXPORT int set_threaded_log_function();
 
     #define LOG_LEVEL_INFO   1
     #define LOG_LEVEL_ERROR  2
 
-    void jack_log_function(int level, const char *message);
+    Jack_API_EXPORT void jack_log_function(int level, const char *message);
     typedef void (* jack_log_function_t)(int level, const char *message);
 
 #ifdef __cplusplus

@@ -28,7 +28,7 @@ namespace Jack {
      * Interface for objects that MIDI events can be read from.
      */
 
-    class SERVER_EXPORT JackMidiReadQueue {
+    class Jack_API_EXPORT JackMidiReadQueue {
 
     public:
 

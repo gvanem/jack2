@@ -28,7 +28,7 @@ namespace Jack {
      * Implemented by MIDI input connections.
      */
 
-    class SERVER_EXPORT JackMidiReceiveQueue: public JackMidiReadQueue {
+    class Jack_API_EXPORT JackMidiReceiveQueue: public JackMidiReadQueue {
 
     public:
 

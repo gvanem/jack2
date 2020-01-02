@@ -31,7 +31,7 @@ namespace Jack
 \brief The base class for threaded drivers using a "decorator" pattern. Threaded drivers are used with blocking devices.
 */
 
-class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackRunnableInterface
+class Jack_API_EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackRunnableInterface
 {
 
     protected:

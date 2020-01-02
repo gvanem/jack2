@@ -35,7 +35,7 @@ class JackClient;
 \brief JackClientChannel using pipes.
 */
 
-class JackWinNamedPipeClientChannel : public JackGenericClientChannel, public JackRunnableInterface
+class Jack_API_EXPORT JackWinNamedPipeClientChannel : public JackGenericClientChannel, public JackRunnableInterface
 {
 
     private:

@@ -43,7 +43,7 @@ namespace Jack {
      * send raw MIDI bytes.
      */
 
-    class SERVER_EXPORT JackMidiRawOutputWriteQueue:
+    class Jack_API_EXPORT JackMidiRawOutputWriteQueue:
         public JackMidiWriteQueue {
 
     private:

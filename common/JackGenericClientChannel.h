@@ -32,7 +32,7 @@ struct JackResult;
 \brief Generic JackClientChannel class.
 */
 
-class JackGenericClientChannel : public detail::JackClientChannelInterface
+class Jack_API_EXPORT JackGenericClientChannel : public detail::JackClientChannelInterface
 {
 
     protected:

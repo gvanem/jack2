@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -46,7 +46,7 @@ struct JackTimingMeasureClient
     jack_time_t	fFinishedAt;
     jack_client_state_t fStatus;
 
-    JackTimingMeasureClient() 
+    JackTimingMeasureClient()
         :fRefNum(-1),
         fSignaledAt(0),
         fAwakeAt(0),
@@ -90,7 +90,7 @@ struct JackTimingMeasure
     JackTimingMeasureClient fClientTable[CLIENT_NUM];
 
     JackTimingMeasure()
-        :fAudioCycle(0), 
+        :fAudioCycle(0),
         fPeriodUsecs(0),
         fCurCycleBegin(0),
         fPrevCycleEnd(0)
@@ -106,7 +106,7 @@ class JackClientInterface;
 class JackGraphManager;
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackEngineProfiling
+class Jack_API_EXPORT JackEngineProfiling
 {
 
     private:
@@ -124,12 +124,12 @@ class SERVER_EXPORT JackEngineProfiling
         JackEngineProfiling();
         ~JackEngineProfiling();
 
-        void Profile(JackClientInterface** table, 
-                    JackGraphManager* manager, 
+        void Profile(JackClientInterface** table,
+                    JackGraphManager* manager,
                     jack_time_t period_usecs,
-                    jack_time_t cur_cycle_begin, 
+                    jack_time_t cur_cycle_begin,
                     jack_time_t prev_cycle_end);
-                    
+
         JackTimingMeasure* GetCurMeasure();
 
 } POST_PACKED_STRUCTURE;

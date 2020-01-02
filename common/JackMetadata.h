@@ -24,12 +24,6 @@
 #include "config.h"
 #endif
 
-// libdb does not work in 32bit mixed mode
-#ifdef BUILD_WITH_32_64
-#undef HAVE_DB
-#define HAVE_DB 0
-#endif
-
 #include <stdint.h>
 
 #if HAVE_DB
@@ -66,6 +60,19 @@ typedef void (*JackPropertyChangeCallback)(jack_uuid_t            subject,
                                            jack_property_change_t change,
                                            void*                  arg);
 
+/* Copied from 'common/jack/metadata.h':
+ */
+extern Jack_API_EXPORT const char* JACK_METADATA_CONNECTED;
+extern Jack_API_EXPORT const char* JACK_METADATA_EVENT_TYPES;
+extern Jack_API_EXPORT const char* JACK_METADATA_HARDWARE;
+extern Jack_API_EXPORT const char* JACK_METADATA_ICON_SMALL;
+extern Jack_API_EXPORT const char* JACK_METADATA_ICON_LARGE;
+extern Jack_API_EXPORT const char* JACK_METADATA_ICON_NAME;
+extern Jack_API_EXPORT const char* JACK_METADATA_ORDER;
+extern Jack_API_EXPORT const char* JACK_METADATA_PRETTY_NAME;
+extern Jack_API_EXPORT const char* JACK_METADATA_PORT_GROUP;
+extern Jack_API_EXPORT const char* JACK_METADATA_SIGNAL_TYPE;
+
 #ifdef __cplusplus
 }
 #endif
@@ -80,7 +87,7 @@ class JackClient;
 \brief Metadata base.
 */
 
-class JackMetadata
+class Jack_API_EXPORT JackMetadata
 {
     private:
 

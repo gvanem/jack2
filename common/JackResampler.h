@@ -38,7 +38,7 @@ inline float Range(float min, float max, float val)
 \brief Base class for RingBuffer in frames.
 */
 
-class JackRingBuffer
+class Jack_API_EXPORT JackRingBuffer
 {
 
     protected:
@@ -76,7 +76,7 @@ class JackRingBuffer
 \brief Base class for Resampler.
 */
 
-class JackResampler : public JackRingBuffer
+class Jack_API_EXPORT JackResampler : public JackRingBuffer
 {
 
     protected:

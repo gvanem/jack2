@@ -36,7 +36,7 @@ namespace Jack {
      * resolution.
      */
 
-    class SERVER_EXPORT JackMidiAsyncWaitQueue: public JackMidiAsyncQueue {
+    class Jack_API_EXPORT JackMidiAsyncWaitQueue: public JackMidiAsyncQueue {
 
     private:
 

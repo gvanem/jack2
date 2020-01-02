@@ -40,7 +40,7 @@ class JackSlaveDriverInterface;
 \brief The base interface for drivers.
 */
 
-class SERVER_EXPORT JackDriverInterface
+class Jack_API_EXPORT JackDriverInterface
 {
 
     public:
@@ -111,7 +111,7 @@ class SERVER_EXPORT JackDriverInterface
  \brief The base interface for drivers clients.
  */
 
-class SERVER_EXPORT JackDriverClientInterface : public JackDriverInterface, public JackClientInterface
+class Jack_API_EXPORT JackDriverClientInterface : public JackDriverInterface, public JackClientInterface
 {};
 
 /*!
@@ -124,7 +124,7 @@ class SERVER_EXPORT JackDriverClientInterface : public JackDriverInterface, publ
 
 typedef std::list<std::pair<std::string, std::pair<std::string, std::string> > > driver_connections_list_t; // [type : (src, dst)]
 
-class SERVER_EXPORT JackDriver : public JackDriverClientInterface
+class Jack_API_EXPORT JackDriver : public JackDriverClientInterface
 {
 
     protected:

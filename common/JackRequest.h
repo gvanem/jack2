@@ -53,7 +53,7 @@ enum JackSessionReply {
 \brief Request from client to server.
 */
 
-struct JackRequest
+struct Jack_API_EXPORT JackRequest
 {
 
     enum RequestType {
@@ -127,7 +127,7 @@ struct JackRequest
 \brief Result from the server.
 */
 
-struct JackResult
+struct Jack_API_EXPORT JackResult
 {
 
     int fResult;
@@ -155,7 +155,7 @@ struct JackResult
 \brief CheckClient request.
 */
 
-struct JackClientCheckRequest : public JackRequest
+struct Jack_API_EXPORT JackClientCheckRequest : public JackRequest
 {
 
     char fName[JACK_CLIENT_NAME_SIZE+1];
@@ -203,7 +203,7 @@ struct JackClientCheckRequest : public JackRequest
 \brief CheckClient result.
 */
 
-struct JackClientCheckResult : public JackResult
+struct Jack_API_EXPORT  JackClientCheckResult : public JackResult
 {
 
     char fName[JACK_CLIENT_NAME_SIZE+1];
@@ -242,7 +242,7 @@ struct JackClientCheckResult : public JackResult
 \brief NewClient request.
 */
 
-struct JackClientOpenRequest : public JackRequest
+struct Jack_API_EXPORT JackClientOpenRequest : public JackRequest
 {
 
     int fPID;
@@ -285,7 +285,7 @@ struct JackClientOpenRequest : public JackRequest
 \brief NewClient result.
 */
 
-struct JackClientOpenResult : public JackResult
+struct Jack_API_EXPORT JackClientOpenResult : public JackResult
 {
 
     int fSharedEngine;
@@ -323,7 +323,7 @@ struct JackClientOpenResult : public JackResult
 \brief CloseClient request.
 */
 
-struct JackClientCloseRequest : public JackRequest
+struct Jack_API_EXPORT JackClientCloseRequest : public JackRequest
 {
 
     int fRefNum;
@@ -352,7 +352,7 @@ struct JackClientCloseRequest : public JackRequest
 \brief Activate request.
 */
 
-struct JackActivateRequest : public JackRequest
+struct Jack_API_EXPORT JackActivateRequest : public JackRequest
 {
 
     int fRefNum;
@@ -385,7 +385,7 @@ struct JackActivateRequest : public JackRequest
 \brief Deactivate request.
 */
 
-struct JackDeactivateRequest : public JackRequest
+struct Jack_API_EXPORT JackDeactivateRequest : public JackRequest
 {
 
     int fRefNum;
@@ -414,7 +414,7 @@ struct JackDeactivateRequest : public JackRequest
 \brief PortRegister request.
 */
 
-struct JackPortRegisterRequest : public JackRequest
+struct Jack_API_EXPORT JackPortRegisterRequest : public JackRequest
 {
 
     int fRefNum;
@@ -467,7 +467,7 @@ struct JackPortRegisterRequest : public JackRequest
 \brief PortRegister result.
 */
 
-struct JackPortRegisterResult : public JackResult
+struct Jack_API_EXPORT JackPortRegisterResult : public JackResult
 {
 
     jack_port_id_t fPortIndex;
@@ -493,7 +493,7 @@ struct JackPortRegisterResult : public JackResult
 \brief PortUnregister request.
 */
 
-struct JackPortUnRegisterRequest : public JackRequest
+struct Jack_API_EXPORT JackPortUnRegisterRequest : public JackRequest
 {
 
     int fRefNum;
@@ -528,7 +528,7 @@ struct JackPortUnRegisterRequest : public JackRequest
 \brief PortConnectName request.
 */
 
-struct JackPortConnectNameRequest : public JackRequest
+struct Jack_API_EXPORT JackPortConnectNameRequest : public JackRequest
 {
 
     int fRefNum;
@@ -575,7 +575,7 @@ struct JackPortConnectNameRequest : public JackRequest
 \brief PortDisconnectName request.
 */
 
-struct JackPortDisconnectNameRequest : public JackRequest
+struct Jack_API_EXPORT JackPortDisconnectNameRequest : public JackRequest
 {
 
     int fRefNum;
@@ -622,7 +622,7 @@ struct JackPortDisconnectNameRequest : public JackRequest
 \brief PortConnect request.
 */
 
-struct JackPortConnectRequest : public JackRequest
+struct Jack_API_EXPORT JackPortConnectRequest : public JackRequest
 {
 
     int fRefNum;
@@ -660,7 +660,7 @@ struct JackPortConnectRequest : public JackRequest
 \brief PortDisconnect request.
 */
 
-struct JackPortDisconnectRequest : public JackRequest
+struct Jack_API_EXPORT JackPortDisconnectRequest : public JackRequest
 {
 
     int fRefNum;
@@ -698,7 +698,7 @@ struct JackPortDisconnectRequest : public JackRequest
 \brief PortRename request.
 */
 
-struct JackPortRenameRequest : public JackRequest
+struct Jack_API_EXPORT JackPortRenameRequest : public JackRequest
 {
 
     int fRefNum;
@@ -742,7 +742,7 @@ struct JackPortRenameRequest : public JackRequest
 \brief SetBufferSize request.
 */
 
-struct JackSetBufferSizeRequest : public JackRequest
+struct Jack_API_EXPORT JackSetBufferSizeRequest : public JackRequest
 {
 
     jack_nframes_t fBufferSize;
@@ -772,7 +772,7 @@ struct JackSetBufferSizeRequest : public JackRequest
 \brief SetFreeWheel request.
 */
 
-struct JackSetFreeWheelRequest : public JackRequest
+struct Jack_API_EXPORT JackSetFreeWheelRequest : public JackRequest
 {
 
     int fOnOff;
@@ -803,7 +803,7 @@ struct JackSetFreeWheelRequest : public JackRequest
 \brief ComputeTotalLatencies request.
 */
 
-struct JackComputeTotalLatenciesRequest : public JackRequest
+struct Jack_API_EXPORT JackComputeTotalLatenciesRequest : public JackRequest
 {
 
     JackComputeTotalLatenciesRequest()
@@ -829,7 +829,7 @@ struct JackComputeTotalLatenciesRequest : public JackRequest
 \brief ReleaseTimebase request.
 */
 
-struct JackReleaseTimebaseRequest : public JackRequest
+struct Jack_API_EXPORT JackReleaseTimebaseRequest : public JackRequest
 {
 
     int fRefNum;
@@ -860,7 +860,7 @@ struct JackReleaseTimebaseRequest : public JackRequest
 \brief SetTimebaseCallback request.
 */
 
-struct JackSetTimebaseCallbackRequest : public JackRequest
+struct Jack_API_EXPORT JackSetTimebaseCallbackRequest : public JackRequest
 {
 
     int fRefNum;
@@ -893,7 +893,7 @@ struct JackSetTimebaseCallbackRequest : public JackRequest
 \brief GetInternalClientName request.
 */
 
-struct JackGetInternalClientNameRequest : public JackRequest
+struct Jack_API_EXPORT JackGetInternalClientNameRequest : public JackRequest
 {
 
     int fRefNum;
@@ -926,7 +926,7 @@ struct JackGetInternalClientNameRequest : public JackRequest
 \brief GetInternalClient result.
 */
 
-struct JackGetInternalClientNameResult : public JackResult
+struct Jack_API_EXPORT JackGetInternalClientNameResult : public JackResult
 {
 
     char fName[JACK_CLIENT_NAME_SIZE+1];
@@ -963,7 +963,7 @@ struct JackGetInternalClientNameResult : public JackResult
 \brief InternalClientHandle request.
 */
 
-struct JackInternalClientHandleRequest : public JackRequest
+struct Jack_API_EXPORT JackInternalClientHandleRequest : public JackRequest
 {
 
     int fRefNum;
@@ -1001,7 +1001,7 @@ struct JackInternalClientHandleRequest : public JackRequest
 \brief InternalClientHandle result.
 */
 
-struct JackInternalClientHandleResult : public JackResult
+struct Jack_API_EXPORT JackInternalClientHandleResult : public JackResult
 {
 
     int fStatus;
@@ -1036,7 +1036,7 @@ struct JackInternalClientHandleResult : public JackResult
 \brief InternalClientLoad request.
 */
 
-struct JackInternalClientLoadRequest : public JackRequest
+struct Jack_API_EXPORT JackInternalClientLoadRequest : public JackRequest
 {
 
 #ifndef MAX_PATH
@@ -1100,7 +1100,7 @@ struct JackInternalClientLoadRequest : public JackRequest
 \brief InternalClientLoad result.
 */
 
-struct JackInternalClientLoadResult : public JackResult
+struct Jack_API_EXPORT JackInternalClientLoadResult : public JackResult
 {
 
     int fStatus;
@@ -1135,7 +1135,7 @@ struct JackInternalClientLoadResult : public JackResult
 \brief InternalClientUnload request.
 */
 
-struct JackInternalClientUnloadRequest : public JackRequest
+struct Jack_API_EXPORT JackInternalClientUnloadRequest : public JackRequest
 {
 
     int fRefNum;
@@ -1168,7 +1168,7 @@ struct JackInternalClientUnloadRequest : public JackRequest
 \brief InternalClientLoad result.
 */
 
-struct JackInternalClientUnloadResult : public JackResult
+struct Jack_API_EXPORT JackInternalClientUnloadResult : public JackResult
 {
 
     int fStatus;
@@ -1200,7 +1200,7 @@ struct JackInternalClientUnloadResult : public JackResult
 \brief ClientNotification request.
 */
 
-struct JackClientNotificationRequest : public JackRequest
+struct Jack_API_EXPORT JackClientNotificationRequest : public JackRequest
 {
 
     int fRefNum;
@@ -1235,7 +1235,7 @@ struct JackClientNotificationRequest : public JackRequest
 
 };
 
-struct JackSessionCommand
+struct Jack_API_EXPORT JackSessionCommand
 {
     char fUUID[JACK_UUID_STRING_SIZE];
     char fClientName[JACK_CLIENT_NAME_SIZE+1];
@@ -1260,7 +1260,7 @@ struct JackSessionCommand
     }
 };
 
-struct JackSessionNotifyResult : public JackResult
+struct Jack_API_EXPORT JackSessionNotifyResult : public JackResult
 {
 
     std::list<JackSessionCommand> fCommandList;
@@ -1353,7 +1353,7 @@ struct JackSessionNotifyResult : public JackResult
 \brief SessionNotify request.
 */
 
-struct JackSessionNotifyRequest : public JackRequest
+struct Jack_API_EXPORT JackSessionNotifyRequest : public JackRequest
 {
     char fPath[JACK_MESSAGE_SIZE+1];
     char fDst[JACK_CLIENT_NAME_SIZE+1];
@@ -1396,7 +1396,7 @@ struct JackSessionNotifyRequest : public JackRequest
     int Size() { return sizeof(fRefNum) + sizeof(fPath) + sizeof(fDst) + sizeof(fEventType); }
 };
 
-struct JackSessionReplyRequest : public JackRequest
+struct Jack_API_EXPORT JackSessionReplyRequest : public JackRequest
 {
     int fRefNum;
 
@@ -1425,7 +1425,7 @@ struct JackSessionReplyRequest : public JackRequest
 
 };
 
-struct JackClientNameResult : public JackResult
+struct Jack_API_EXPORT JackClientNameResult : public JackResult
 {
     char fName[JACK_CLIENT_NAME_SIZE+1];
 
@@ -1456,7 +1456,7 @@ struct JackClientNameResult : public JackResult
 
 };
 
-struct JackUUIDResult : public JackResult
+struct Jack_API_EXPORT JackUUIDResult : public JackResult
 {
     char fUUID[JACK_UUID_STRING_SIZE];
 
@@ -1487,7 +1487,7 @@ struct JackUUIDResult : public JackResult
 
 };
 
-struct JackGetUUIDRequest : public JackRequest
+struct Jack_API_EXPORT JackGetUUIDRequest : public JackRequest
 {
     char fName[JACK_CLIENT_NAME_SIZE+1];
 
@@ -1521,7 +1521,7 @@ struct JackGetUUIDRequest : public JackRequest
 
 };
 
-struct JackGetClientNameRequest : public JackRequest
+struct Jack_API_EXPORT JackGetClientNameRequest : public JackRequest
 {
     char fUUID[JACK_UUID_STRING_SIZE];
 
@@ -1555,7 +1555,7 @@ struct JackGetClientNameRequest : public JackRequest
 
 };
 
-struct JackReserveNameRequest : public JackRequest
+struct Jack_API_EXPORT JackReserveNameRequest : public JackRequest
 {
     int  fRefNum;
     char fName[JACK_CLIENT_NAME_SIZE+1];
@@ -1598,7 +1598,7 @@ struct JackReserveNameRequest : public JackRequest
 
 };
 
-struct JackClientHasSessionCallbackRequest : public JackRequest
+struct Jack_API_EXPORT JackClientHasSessionCallbackRequest : public JackRequest
 {
     char fName[JACK_CLIENT_NAME_SIZE+1];
 
@@ -1633,7 +1633,7 @@ struct JackClientHasSessionCallbackRequest : public JackRequest
 };
 
 
-struct JackPropertyChangeNotifyRequest : public JackRequest
+struct Jack_API_EXPORT JackPropertyChangeNotifyRequest : public JackRequest
 {
     jack_uuid_t fSubject;
     char fKey[MAX_PATH+1];
@@ -1678,7 +1678,7 @@ struct JackPropertyChangeNotifyRequest : public JackRequest
 \brief ClientNotification.
 */
 
-struct JackClientNotification
+struct Jack_API_EXPORT JackClientNotification
 {
     int fSize;
     char fName[JACK_CLIENT_NAME_SIZE+1];

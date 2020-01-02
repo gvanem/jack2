@@ -46,7 +46,7 @@ class JackGraphManager;
 */
 
 PRE_PACKED_STRUCTURE
-struct SERVER_EXPORT JackEngineControl : public JackShmMem
+struct Jack_API_EXPORT JackEngineControl : public JackShmMem
 {
     // Shared state
     jack_nframes_t fBufferSize;

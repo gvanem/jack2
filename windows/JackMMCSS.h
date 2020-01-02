@@ -47,7 +47,7 @@ typedef BOOL (WINAPI *avSetMmThreadPriority)(HANDLE, AVRT_PRIORITY);
 \brief MMCSS services.
 */
 
-class SERVER_EXPORT JackMMCSS
+class Jack_API_EXPORT JackMMCSS
 {
 
     private:

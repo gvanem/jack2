@@ -90,7 +90,7 @@ We have:
 class JackClientInterface;
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
+class Jack_API_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
 {
 
     private:

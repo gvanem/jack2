@@ -57,7 +57,7 @@ namespace detail
  \brief The thread base class.
  */
 
-class SERVER_EXPORT JackThreadInterface
+class Jack_API_EXPORT JackThreadInterface
 {
 
     public:
@@ -120,12 +120,12 @@ class SERVER_EXPORT JackThreadInterface
 
 } // end of namespace
 
-bool jack_get_thread_realtime_priority_range(int * min_ptr, int * max_ptr);
+bool Jack_API_EXPORT jack_get_thread_realtime_priority_range(int * min_ptr, int * max_ptr);
 
-bool jack_tls_allocate_key(jack_tls_key *key_ptr);
-bool jack_tls_free_key(jack_tls_key key);
+bool Jack_API_EXPORT jack_tls_allocate_key(jack_tls_key *key_ptr);
+bool Jack_API_EXPORT jack_tls_free_key(jack_tls_key key);
 
-bool jack_tls_set(jack_tls_key key, void *data_ptr);
-void *jack_tls_get(jack_tls_key key);
+bool Jack_API_EXPORT jack_tls_set(jack_tls_key key, void *data_ptr);
+void Jack_API_EXPORT *jack_tls_get(jack_tls_key key);
 
 #endif

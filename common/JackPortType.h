@@ -22,12 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "types.h"
 #include "JackConstants.h"
+#include "JackCompilerDeps.h"
 #include <stddef.h>
 
 namespace Jack
 {
 
-extern jack_port_type_id_t PORT_TYPES_MAX;
+extern Jack_API_EXPORT jack_port_type_id_t PORT_TYPES_MAX;
 
 struct JackPortType
 {
@@ -37,11 +38,11 @@ struct JackPortType
     void (*mixdown)(void *mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes);
 };
 
-extern jack_port_type_id_t GetPortTypeId(const char* port_type);
-extern const struct JackPortType* GetPortType(jack_port_type_id_t port_type_id);
+Jack_API_EXPORT jack_port_type_id_t        GetPortTypeId(const char* port_type);
+Jack_API_EXPORT const struct JackPortType* GetPortType(jack_port_type_id_t port_type_id);
 
-extern const struct JackPortType gAudioPortType;
-extern const struct JackPortType gMidiPortType;
+extern Jack_API_EXPORT const struct JackPortType gAudioPortType;
+extern Jack_API_EXPORT const struct JackPortType gMidiPortType;
 
 } // namespace Jack
 

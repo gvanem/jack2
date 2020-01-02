@@ -28,6 +28,7 @@ extern "C"
 #include <jack/systemdeps.h>
 #include <jack/types.h>
 #include <jack/weakmacros.h>
+#include "JackCompilerDeps.h"
 
 #define DEFAULT_MULTICAST_IP    "225.3.19.154"
 #define DEFAULT_PORT            19000
@@ -35,6 +36,9 @@ extern "C"
 #define MASTER_NAME_SIZE        256
 
 // Possible error codes
+
+#undef  NO_ERROR      /* Also in <winerror.h> with the same value */
+#undef  SOCKET_ERROR  /* Also in <winsock2.h> with the same value */
 
 #define NO_ERROR             0
 #define SOCKET_ERROR        -1
@@ -75,7 +79,7 @@ typedef struct {
     jack_nframes_t sample_rate;         // master sample rate
     char master_name[MASTER_NAME_SIZE]; // master machine name
     int time_out;                       // in second, -1 means infinite
-    int partial_cycle;                  // if 'true', partial buffers will be used 
+    int partial_cycle;                  // if 'true', partial buffers will be used
 
 } jack_master_t;
 
@@ -96,6 +100,7 @@ typedef struct _jack_net_slave jack_net_slave_t;
  *
  * @return Opaque net handle if successful or NULL in case of error.
  */
+JackServer_API_EXPORT
 jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result);
 
 /**
@@ -105,6 +110,7 @@ jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_net_slave_close(jack_net_slave_t* net);
 
 /**
@@ -143,6 +149,7 @@ typedef int (* JackNetSlaveProcessCallback) (jack_nframes_t buffer_size,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_set_net_slave_process_callback(jack_net_slave_t * net, JackNetSlaveProcessCallback net_callback, void *arg);
 
 /**
@@ -152,6 +159,7 @@ int jack_set_net_slave_process_callback(jack_net_slave_t * net, JackNetSlaveProc
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_net_slave_activate(jack_net_slave_t* net);
 
 /**
@@ -161,6 +169,7 @@ int jack_net_slave_activate(jack_net_slave_t* net);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_net_slave_deactivate(jack_net_slave_t* net);
 
 /**
@@ -168,8 +177,9 @@ int jack_net_slave_deactivate(jack_net_slave_t* net);
  *
  * @param net the network connection
  *
- * @return a boolean 
+ * @return a boolean
  */
+JackServer_API_EXPORT
 int jack_net_slave_is_active(jack_net_slave_t* net);
 
 /**
@@ -191,6 +201,7 @@ typedef int (*JackNetSlaveBufferSizeCallback)(jack_nframes_t nframes, void *arg)
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg);
 
 /**
@@ -212,6 +223,7 @@ typedef int (*JackNetSlaveSampleRateCallback)(jack_nframes_t nframes, void *arg)
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg);
 
 /**
@@ -230,12 +242,13 @@ typedef void (*JackNetSlaveShutdownCallback)(void* arg);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
- * Prototype for server Restart callback : this is the new preferable way to be notified when the master has disappeared. 
- * The client may want to retry connecting a certain number of time (which will be done using the time_out value given in jack_net_slave_open) 
- * by returning 0. Otherwise returning a non-zero error code will definively close the connection 
+ * Prototype for server Restart callback : this is the new preferable way to be notified when the master has disappeared.
+ * The client may want to retry connecting a certain number of time (which will be done using the time_out value given in jack_net_slave_open)
+ * by returning 0. Otherwise returning a non-zero error code will definively close the connection
  * (and jack_net_slave_is_active will later on return false).
  * If both Shutdown and Restart are supplied, Restart callback will be used.
  *
@@ -254,6 +267,7 @@ typedef int (*JackNetSlaveRestartCallback)(void* arg);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_set_net_slave_restart_callback(jack_net_slave_t *net, JackNetSlaveRestartCallback restart_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -273,6 +287,7 @@ typedef void (*JackNetSlaveErrorCallback) (int error_code, void* arg);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_set_net_slave_error_callback(jack_net_slave_t *net, JackNetSlaveErrorCallback error_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -290,6 +305,7 @@ typedef struct _jack_net_master jack_net_master_t;
  *
  * @return Opaque net handle if successful or NULL in case of error.
  */
+JackServer_API_EXPORT
 jack_net_master_t* jack_net_master_open(const char* ip, int port, jack_master_t* request, jack_slave_t* result);
 
 /**
@@ -299,6 +315,7 @@ jack_net_master_t* jack_net_master_open(const char* ip, int port, jack_master_t*
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_net_master_close(jack_net_master_t* net);
 
 /**
@@ -312,6 +329,7 @@ int jack_net_master_close(jack_net_master_t* net);
  *
  * @return zero on success, non-zero on error
  */
+JackServer_API_EXPORT
 int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer);
 
 /**
@@ -326,6 +344,7 @@ int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_
  *
  * @return zero on success, non-zero on error
  */
+JackServer_API_EXPORT
 int jack_net_master_recv_slice(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer, int frames);
 
 /**
@@ -339,6 +358,7 @@ int jack_net_master_recv_slice(jack_net_master_t* net, int audio_input, float** 
  *
  * @return zero on success, non-zero on error
  */
+JackServer_API_EXPORT
 int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer);
 
 /**
@@ -353,6 +373,7 @@ int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio
  *
  * @return zero on success, non-zero on error
  */
+JackServer_API_EXPORT
 int jack_net_master_send_slice(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer, int frames);
 
 // Experimental Adapter API
@@ -374,6 +395,7 @@ typedef struct _jack_adapter jack_adapter_t;
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 jack_adapter_t* jack_create_adapter(int input, int output,
                                     jack_nframes_t host_buffer_size,
                                     jack_nframes_t host_sample_rate,
@@ -387,6 +409,7 @@ jack_adapter_t* jack_create_adapter(int input, int output,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_destroy_adapter(jack_adapter_t* adapter);
 
 /**
@@ -396,6 +419,7 @@ int jack_destroy_adapter(jack_adapter_t* adapter);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 void jack_flush_adapter(jack_adapter_t* adapter);
 
 /**
@@ -408,6 +432,7 @@ void jack_flush_adapter(jack_adapter_t* adapter);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 /**
@@ -420,6 +445,7 @@ int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** o
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JackServer_API_EXPORT
 int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 #ifdef __cplusplus

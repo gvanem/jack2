@@ -33,7 +33,7 @@ namespace Jack
 */
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackTimer
+class Jack_API_EXPORT JackTimer
 {
 
     friend class JackFrameTimer;
@@ -76,7 +76,7 @@ class SERVER_EXPORT JackTimer
 */
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
+class Jack_API_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
 {
 
     private:

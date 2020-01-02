@@ -33,7 +33,7 @@ struct JackClientControl;
 \brief Server side implementation of library clients.
 */
 
-class JackExternalClient : public JackClientInterface
+class Jack_API_EXPORT JackExternalClient : public JackClientInterface
 {
 
     private:

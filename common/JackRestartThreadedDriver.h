@@ -27,10 +27,10 @@ namespace Jack
 {
 
 /*!
-\brief Restart a driver after an exception is thrown. 
+\brief Restart a driver after an exception is thrown.
 */
 
-class SERVER_EXPORT JackRestartThreadedDriver : public JackThreadedDriver
+class JackServer_API_EXPORT JackRestartThreadedDriver : public JackThreadedDriver
 {
     public:
 

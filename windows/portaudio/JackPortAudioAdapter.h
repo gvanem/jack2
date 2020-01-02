@@ -63,18 +63,9 @@ namespace Jack
 
 }
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "JackCompilerDeps.h"
 #include "driver_interface.h"
 
-SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor();
-
-#ifdef __cplusplus
-}
-#endif
+extern "C" jack_driver_desc_t* jack_get_descriptor();
 
 #endif

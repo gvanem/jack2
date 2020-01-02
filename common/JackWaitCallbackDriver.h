@@ -32,7 +32,7 @@ Simply ends its thread when the decorated driver Initialize method returns.
 Self register with the supplied JackRestarterDriver so it can restart the thread.
 */
 
-class SERVER_EXPORT JackWaitCallbackDriver : public JackWaitThreadedDriver
+class JackServer_API_EXPORT JackWaitCallbackDriver : public JackWaitThreadedDriver
 {
     public:
 

@@ -24,8 +24,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "types.h"
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
+#include "jack/midiport.h"
+
 #include <stddef.h>
 
+#if 0
 /** Type for raw event data contained in @ref jack_midi_event_t. */
 typedef unsigned char jack_midi_data_t;
 
@@ -36,6 +39,7 @@ struct jack_midi_event_t
     size_t            size;   /**< Number of bytes of data in \a buffer */
     jack_midi_data_t *buffer; /**< Raw MIDI data */
 };
+#endif
 
 /** A Jack MIDI port type. */
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
@@ -43,7 +47,7 @@ struct jack_midi_event_t
 namespace Jack
 {
 
-struct SERVER_EXPORT JackMidiEvent
+struct Jack_API_EXPORT JackMidiEvent
 {
     // Most MIDI events are < 4 bytes in size, so we can save a lot, storing them inplace.
     enum { INLINE_SIZE_MAX = sizeof(jack_shmsize_t) };
@@ -72,7 +76,7 @@ struct SERVER_EXPORT JackMidiEvent
  * but their data (if not inlined) is stored from the end of the same buffer.
  */
 
-struct SERVER_EXPORT JackMidiBuffer
+struct Jack_API_EXPORT JackMidiBuffer
 {
     enum { MAGIC = 0x900df00d };
 
@@ -96,7 +100,7 @@ struct SERVER_EXPORT JackMidiBuffer
     jack_midi_data_t* ReserveEvent(jack_nframes_t time, jack_shmsize_t size);
 };
 
-void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes);
+Jack_API_EXPORT void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes);
 
 } // namespace Jack
 

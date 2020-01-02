@@ -34,7 +34,7 @@
 namespace Jack
 {
 
-    class SERVER_EXPORT JackArgParser
+    class JackServer_API_EXPORT JackArgParser
     {
         private:
 

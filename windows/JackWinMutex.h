@@ -32,7 +32,7 @@ namespace Jack
 /*!
 \brief Mutex abstraction.
 */
-class SERVER_EXPORT JackBaseWinMutex
+class Jack_API_EXPORT JackBaseWinMutex
 {
 
     protected:
@@ -60,7 +60,7 @@ class SERVER_EXPORT JackBaseWinMutex
 
 };
 
-class SERVER_EXPORT JackWinMutex
+class Jack_API_EXPORT JackWinMutex
 {
 
     protected:
@@ -94,7 +94,7 @@ class SERVER_EXPORT JackWinMutex
 
 };
 
-class SERVER_EXPORT JackWinCriticalSection
+class Jack_API_EXPORT JackWinCriticalSection
 {
 
     protected:

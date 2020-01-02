@@ -33,11 +33,11 @@
 namespace Jack
 {
 
-void LockMemoryImp(void* ptr, size_t size);
-void InitLockMemoryImp(void* ptr, size_t size);
-void UnlockMemoryImp(void* ptr, size_t size);
-void LockAllMemory();
-void UnlockAllMemory();
+Jack_API_EXPORT void LockMemoryImp(void* ptr, size_t size);
+Jack_API_EXPORT void InitLockMemoryImp(void* ptr, size_t size);
+Jack_API_EXPORT void UnlockMemoryImp(void* ptr, size_t size);
+Jack_API_EXPORT void LockAllMemory();
+Jack_API_EXPORT void UnlockAllMemory();
 
 class JackMem
 {
@@ -84,7 +84,7 @@ class JackMem
 A class which objects possibly want to be allocated in shared memory derives from this class.
 */
 
-class JackShmMemAble
+class Jack_API_EXPORT JackShmMemAble
 {
     protected:
 
@@ -122,7 +122,7 @@ class JackShmMemAble
 A class which objects need to be allocated in shared memory derives from this class.
 */
 
-class SERVER_EXPORT JackShmMem : public JackShmMemAble
+class Jack_API_EXPORT JackShmMem : public JackShmMemAble
 {
 
      protected:

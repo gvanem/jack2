@@ -35,7 +35,7 @@ class JackClient;
 \brief Global server static structure: singleton kind of pattern.
 */
 
-struct SERVER_EXPORT JackServerGlobals
+struct Jack_API_EXPORT JackServerGlobals
 {
     static JackServer* fInstance;
     static unsigned int fUserCount;

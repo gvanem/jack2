@@ -52,7 +52,7 @@ struct JackMessage
 \brief Message buffer to be used from RT threads.
 */
 
-class JackMessageBuffer : public JackRunnableInterface
+class Jack_API_EXPORT JackMessageBuffer : public JackRunnableInterface
 {
 
     private:
@@ -89,16 +89,8 @@ class JackMessageBuffer : public JackRunnableInterface
 	    static JackMessageBuffer* fInstance;
 };
 
-#ifdef __cplusplus
 extern "C"
-{
-#endif
-
-void JackMessageBufferAdd(int level, const char *message);
-
-#ifdef __cplusplus
-}
-#endif
+Jack_API_EXPORT void JackMessageBufferAdd(int level, const char *message);
 
 };
 

@@ -30,7 +30,7 @@ namespace Jack
 \brief The timed driver.
 */
 
-class SERVER_EXPORT JackTimedDriver : public JackAudioDriver
+class Jack_API_EXPORT JackTimedDriver : public JackAudioDriver
 {
     protected:
 
@@ -60,7 +60,7 @@ class SERVER_EXPORT JackTimedDriver : public JackAudioDriver
 
 };
 
-class SERVER_EXPORT JackWaiterDriver : public JackTimedDriver
+class Jack_API_EXPORT JackWaiterDriver : public JackTimedDriver
 {
 
     public:
@@ -81,7 +81,7 @@ class SERVER_EXPORT JackWaiterDriver : public JackTimedDriver
 When wrapped into a JackWaitCallbackDriver, this driver can restart the
 wrapper thread which will wait again for the Initialize method to return.
 */
-class SERVER_EXPORT JackRestarterDriver : public JackWaiterDriver
+class Jack_API_EXPORT JackRestarterDriver : public JackWaiterDriver
 {
 
     private:

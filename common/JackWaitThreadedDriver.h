@@ -35,7 +35,7 @@ The Execute method will call the ProcessNull method from the base JackWaiterDriv
 A helper JackDriverStarter thread is used for that purpose.
 */
 
-class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
+class Jack_API_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
 {
     private:
 

@@ -43,7 +43,7 @@ class JackLoadableInternalClient;
 \brief The Jack server.
 */
 
-class SERVER_EXPORT JackServer
+class Jack_API_EXPORT JackServer
 {
 
     private:

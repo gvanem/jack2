@@ -27,6 +27,7 @@ extern "C" {
 
 #include <jack/types.h>
 #include <jack/weakmacros.h>
+#include <jack/export.h>
 
 /**
  * @defgroup SessionClientFunctions Session API for clients.
@@ -172,6 +173,7 @@ typedef void (*JackSessionCallback)(jack_session_event_t *event,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+Jack_API_EXPORT
 int jack_set_session_callback (jack_client_t       *client,
                                JackSessionCallback  session_callback,
                                void                *arg) JACK_WEAK_EXPORT;
@@ -185,6 +187,7 @@ int jack_set_session_callback (jack_client_t       *client,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+Jack_API_EXPORT
 int jack_session_reply (jack_client_t        *client,
                         jack_session_event_t *event) JACK_WEAK_EXPORT;
 
@@ -194,6 +197,7 @@ int jack_session_reply (jack_client_t        *client,
  *
  * This also frees the memory used by the command_line pointer, if its non NULL.
  */
+Jack_API_EXPORT
 void jack_session_event_free (jack_session_event_t *event) JACK_WEAK_EXPORT;
 
 
@@ -204,6 +208,7 @@ void jack_session_event_free (jack_session_event_t *event) JACK_WEAK_EXPORT;
  * The caller is responsible for calling jack_free(3) on any non-NULL
  * returned value.
  */
+Jack_API_EXPORT
 char *jack_client_get_uuid (jack_client_t *client) JACK_WEAK_EXPORT;
 
 /**
@@ -230,6 +235,7 @@ typedef struct  {
  * of jack_session_command_t. its terminated by ret[i].uuid == NULL target ==
  * NULL means send to all interested clients. otherwise a clientname
  */
+Jack_API_EXPORT
 jack_session_command_t *jack_session_notify (
 	jack_client_t*             client,
 	const char                *target,
@@ -239,6 +245,7 @@ jack_session_command_t *jack_session_notify (
 /**
  * Free the memory allocated by a session command.
  */
+Jack_API_EXPORT
 void jack_session_commands_free (jack_session_command_t *cmds) JACK_WEAK_EXPORT;
 
 /**
@@ -250,7 +257,7 @@ void jack_session_commands_free (jack_session_command_t *cmds) JACK_WEAK_EXPORT;
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int
+Jack_API_EXPORT int
 jack_reserve_client_name (jack_client_t *client,
                           const char    *name,
                           const char    *uuid) JACK_WEAK_EXPORT;
@@ -261,7 +268,7 @@ jack_reserve_client_name (jack_client_t *client,
  * @return 0 when the client has no session callback, 1 when it has one.
  *        -1 on error.
  */
-int
+Jack_API_EXPORT int
 jack_client_has_session_callback (jack_client_t *client, const char *client_name) JACK_WEAK_EXPORT;
 
 #ifdef __cplusplus

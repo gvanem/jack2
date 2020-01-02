@@ -45,7 +45,7 @@ namespace Jack
     \Brief This class describes the basic Net Interface, used by both master and slave.
     */
 
-    class SERVER_EXPORT JackNetInterface
+    class JackServer_API_EXPORT JackNetInterface
     {
 
         friend class JackNetExt;
@@ -140,7 +140,7 @@ namespace Jack
     \Brief This class describes the Net Interface for masters (NetMaster)
     */
 
-    class SERVER_EXPORT JackNetMasterInterface : public JackNetInterface
+    class JackServer_API_EXPORT JackNetMasterInterface : public JackNetInterface
     {
 
         protected:
@@ -173,18 +173,18 @@ namespace Jack
 
         public:
 
-            JackNetMasterInterface() 
-                : JackNetInterface(), 
-                fRunning(false), 
-                fCurrentCycleOffset(0), 
-                fMaxCycleOffset(0), 
+            JackNetMasterInterface()
+                : JackNetInterface(),
+                fRunning(false),
+                fCurrentCycleOffset(0),
+                fMaxCycleOffset(0),
                 fSynched(false)
             {}
             JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
-                    : JackNetInterface(params, socket, multicast_ip), 
-                    fRunning(false), 
-                    fCurrentCycleOffset(0), 
-                    fMaxCycleOffset(0), 
+                    : JackNetInterface(params, socket, multicast_ip),
+                    fRunning(false),
+                    fCurrentCycleOffset(0),
+                    fMaxCycleOffset(0),
                     fSynched(false)
             {}
 
@@ -196,7 +196,7 @@ namespace Jack
     \Brief This class describes the Net Interface for slaves (NetDriver and NetAdapter)
     */
 
-    class SERVER_EXPORT JackNetSlaveInterface : public JackNetInterface
+    class JackServer_API_EXPORT JackNetSlaveInterface : public JackNetInterface
     {
 
         protected:

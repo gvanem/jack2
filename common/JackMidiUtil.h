@@ -41,7 +41,7 @@ namespace Jack {
      * message for each message that can be optimized.
      */
 
-    SERVER_EXPORT jack_midi_data_t
+    Jack_API_EXPORT jack_midi_data_t
     ApplyRunningStatus(size_t *size, jack_midi_data_t **buffer,
                        jack_midi_data_t running_status=0);
 
@@ -49,7 +49,7 @@ namespace Jack {
      * A wrapper function for the above `ApplyRunningStatus` function.
      */
 
-    SERVER_EXPORT jack_midi_data_t
+    Jack_API_EXPORT jack_midi_data_t
     ApplyRunningStatus(jack_midi_event_t *event,
                        jack_midi_data_t running_status);
 
@@ -58,7 +58,7 @@ namespace Jack {
      * functionality as the JACK client API function `jack_frame_time`.
      */
 
-    SERVER_EXPORT jack_nframes_t
+    Jack_API_EXPORT jack_nframes_t
     GetCurrentFrame();
 
     /**
@@ -67,7 +67,7 @@ namespace Jack {
      * `jack_time_to_frames`.
      */
 
-    SERVER_EXPORT jack_nframes_t
+    Jack_API_EXPORT jack_nframes_t
     GetFramesFromTime(jack_time_t time);
 
     /**
@@ -76,7 +76,7 @@ namespace Jack {
      * `jack_last_frame_time`.
      */
 
-    SERVER_EXPORT jack_nframes_t
+    Jack_API_EXPORT jack_nframes_t
     GetLastFrame();
 
     /**
@@ -85,7 +85,7 @@ namespace Jack {
      * byte is invalid.
      */
 
-    SERVER_EXPORT int
+    Jack_API_EXPORT int
     GetMessageLength(jack_midi_data_t status_byte);
 
     /**
@@ -94,7 +94,7 @@ namespace Jack {
      * `jack_frames_to_time`.
      */
 
-    SERVER_EXPORT jack_time_t
+    Jack_API_EXPORT jack_time_t
     GetTimeFromFrames(jack_nframes_t frames);
 
 };

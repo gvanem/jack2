@@ -30,7 +30,7 @@ namespace Jack
 \brief Resampler using "libsamplerate" (http://www.mega-nerd.com/SRC/).
 */
 
-class JackLibSampleRateResampler : public JackResampler
+class Jack_API_EXPORT JackLibSampleRateResampler : public JackResampler
 {
 
     private:

@@ -106,7 +106,7 @@ extern "C" {
  *
  * @return the configurated signal set.
  */
-jackctl_sigmask_t *
+Jack_API_EXPORT jackctl_sigmask_t *
 jackctl_setup_signals(
     unsigned int flags);
 
@@ -115,7 +115,7 @@ jackctl_setup_signals(
  *
  * @param signals signals set to wait on
  */
-void
+Jack_API_EXPORT void
 jackctl_wait_signals(
     jackctl_sigmask_t * signals);
 
@@ -125,7 +125,7 @@ jackctl_wait_signals(
  *
  * @deprecated Please use jackctl_server_create2().
  */
-jackctl_server_t *
+Jack_API_EXPORT jackctl_server_t *
 jackctl_server_create(
     bool (* on_device_acquire)(const char * device_name),
     void (* on_device_release)(const char * device_name));
@@ -141,7 +141,7 @@ jackctl_server_create(
  * failed. Successfully created server object must be destroyed with
  * paired call to ::jackctl_server_destroy
  */
-jackctl_server_t *
+Jack_API_EXPORT jackctl_server_t *
 jackctl_server_create2(
     bool (* on_device_acquire)(const char * device_name),
     void (* on_device_release)(const char * device_name),
@@ -152,7 +152,7 @@ jackctl_server_create2(
  *
  * @param server server object handle to destroy
  */
-void
+Jack_API_EXPORT void
 jackctl_server_destroy(
 	jackctl_server_t * server);
 
@@ -164,7 +164,7 @@ jackctl_server_destroy(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_open(
     jackctl_server_t * server,
     jackctl_driver_t * driver);
@@ -176,7 +176,7 @@ jackctl_server_open(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_start(
     jackctl_server_t * server);
 
@@ -187,7 +187,7 @@ jackctl_server_start(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_stop(
 	jackctl_server_t * server);
 
@@ -198,7 +198,7 @@ jackctl_server_stop(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_close(
 	jackctl_server_t * server);
 
@@ -211,7 +211,7 @@ jackctl_server_close(
  * @return Single linked list of driver object handles. Must not be
  * modified. Always same for same server object.
  */
-const JSList *
+Jack_API_EXPORT const JSList *
 jackctl_server_get_drivers_list(
 	jackctl_server_t * server);
 
@@ -224,7 +224,7 @@ jackctl_server_get_drivers_list(
  * @return Single linked list of parameter object handles. Must not be
  * modified. Always same for same server object.
  */
-const JSList *
+Jack_API_EXPORT const JSList *
 jackctl_server_get_parameters(
 	jackctl_server_t * server);
 
@@ -237,7 +237,7 @@ jackctl_server_get_parameters(
  * @return Single linked list of internal client object handles. Must not be
  * modified. Always same for same server object.
  */
-const JSList *
+Jack_API_EXPORT const JSList *
 jackctl_server_get_internals_list(
 	jackctl_server_t * server);
 
@@ -250,7 +250,7 @@ jackctl_server_get_internals_list(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_load_internal(
     jackctl_server_t * server,
     jackctl_internal_t * internal);
@@ -264,7 +264,7 @@ jackctl_server_load_internal(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_unload_internal(
     jackctl_server_t * server,
     jackctl_internal_t * internal);
@@ -279,7 +279,7 @@ jackctl_server_unload_internal(
  *
  * @return success status: true - success, false - fail
  */
-bool jackctl_server_load_session_file(
+Jack_API_EXPORT bool jackctl_server_load_session_file(
     jackctl_server_t * server_ptr,
     const char * file);
 
@@ -293,7 +293,7 @@ bool jackctl_server_load_session_file(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
@@ -307,7 +307,7 @@ jackctl_server_add_slave(jackctl_server_t * server,
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
@@ -319,7 +319,7 @@ jackctl_server_remove_slave(jackctl_server_t * server,
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_server_switch_master(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
@@ -332,7 +332,7 @@ jackctl_server_switch_master(jackctl_server_t * server,
  * @return driver name. Must not be modified. Always same for same
  * driver object.
  */
-const char *
+Jack_API_EXPORT const char *
 jackctl_driver_get_name(
 	jackctl_driver_t * driver);
 
@@ -344,7 +344,7 @@ jackctl_driver_get_name(
  * @return driver type. Must not be modified. Always same for same
  * driver object.
  */
-jackctl_driver_type_t
+Jack_API_EXPORT jackctl_driver_type_t
 jackctl_driver_get_type(
 	jackctl_driver_t * driver);
 
@@ -357,7 +357,7 @@ jackctl_driver_get_type(
  * @return Single linked list of parameter object handles. Must not be
  * modified. Always same for same driver object.
  */
-const JSList *
+Jack_API_EXPORT const JSList *
 jackctl_driver_get_parameters(
 	jackctl_driver_t * driver);
 
@@ -370,7 +370,7 @@ jackctl_driver_get_parameters(
  *
  * @return success status: true - success, false - fail
  */
-int
+Jack_API_EXPORT int
 jackctl_driver_params_parse(
     jackctl_driver_t * driver,
     int argc,
@@ -384,7 +384,7 @@ jackctl_driver_params_parse(
  * @return internal name. Must not be modified. Always same for same
  * internal object.
  */
-const char *
+Jack_API_EXPORT const char *
 jackctl_internal_get_name(
 	jackctl_internal_t * internal);
 
@@ -397,7 +397,7 @@ jackctl_internal_get_name(
  * @return Single linked list of parameter object handles. Must not be
  * modified. Always same for same internal object.
  */
-const JSList *
+Jack_API_EXPORT const JSList *
 jackctl_internal_get_parameters(
 	jackctl_internal_t * internal);
 
@@ -409,7 +409,7 @@ jackctl_internal_get_parameters(
  * @return parameter name. Must not be modified. Always same for same
  * parameter object.
  */
-const char *
+Jack_API_EXPORT const char *
 jackctl_parameter_get_name(
 	jackctl_parameter_t * parameter);
 
@@ -421,7 +421,7 @@ jackctl_parameter_get_name(
  * @return parameter short description. Must not be modified. Always
  * same for same parameter object.
  */
-const char *
+Jack_API_EXPORT const char *
 jackctl_parameter_get_short_description(
 	jackctl_parameter_t * parameter);
 
@@ -433,7 +433,7 @@ jackctl_parameter_get_short_description(
  * @return parameter long description. Must not be modified. Always
  * same for same parameter object.
  */
-const char *
+Jack_API_EXPORT const char *
 jackctl_parameter_get_long_description(
 	jackctl_parameter_t * parameter);
 
@@ -444,7 +444,7 @@ jackctl_parameter_get_long_description(
  *
  * @return parameter type. Always same for same parameter object.
  */
-jackctl_param_type_t
+Jack_API_EXPORT jackctl_param_type_t
 jackctl_parameter_get_type(
 	jackctl_parameter_t * parameter);
 
@@ -455,7 +455,7 @@ jackctl_parameter_get_type(
  *
  * @return character.
  */
-char
+Jack_API_EXPORT char
 jackctl_parameter_get_id(
 	jackctl_parameter_t * parameter);
 
@@ -468,7 +468,7 @@ jackctl_parameter_get_id(
  * @return true - parameter is set, false - parameter is using default
  * value.
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_is_set(
 	jackctl_parameter_t * parameter);
 
@@ -479,7 +479,7 @@ jackctl_parameter_is_set(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_reset(
 	jackctl_parameter_t * parameter);
 
@@ -490,7 +490,7 @@ jackctl_parameter_reset(
  *
  * @return parameter value.
  */
-union jackctl_parameter_value
+Jack_API_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_value(
 	jackctl_parameter_t * parameter);
 
@@ -502,7 +502,7 @@ jackctl_parameter_get_value(
  *
  * @return success status: true - success, false - fail
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_set_value(
 	jackctl_parameter_t * parameter,
 	const union jackctl_parameter_value * value_ptr);
@@ -514,7 +514,7 @@ jackctl_parameter_set_value(
  *
  * @return parameter default value.
  */
-union jackctl_parameter_value
+Jack_API_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
 
@@ -525,7 +525,7 @@ jackctl_parameter_get_default_value(
  *
  * @return whether parameter has range constraint.
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_has_range_constraint(
 	jackctl_parameter_t * parameter);
 
@@ -536,7 +536,7 @@ jackctl_parameter_has_range_constraint(
  *
  * @return whether parameter has enumeration constraint.
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_has_enum_constraint(
 	jackctl_parameter_t * parameter);
 
@@ -547,7 +547,7 @@ jackctl_parameter_has_enum_constraint(
  *
  * @return number of enumeration values
  */
-uint32_t
+Jack_API_EXPORT uint32_t
 jackctl_parameter_get_enum_constraints_count(
 	jackctl_parameter_t * parameter);
 
@@ -559,7 +559,7 @@ jackctl_parameter_get_enum_constraints_count(
  *
  * @return enumeration value.
  */
-union jackctl_parameter_value
+Jack_API_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_enum_constraint_value(
 	jackctl_parameter_t * parameter,
 	uint32_t index);
@@ -572,7 +572,7 @@ jackctl_parameter_get_enum_constraint_value(
  *
  * @return enumeration value description.
  */
-const char *
+Jack_API_EXPORT const char *
 jackctl_parameter_get_enum_constraint_description(
 	jackctl_parameter_t * parameter,
 	uint32_t index);
@@ -584,7 +584,7 @@ jackctl_parameter_get_enum_constraint_description(
  * @param min_ptr pointer to variable receiving parameter minimum value
  * @param max_ptr pointer to variable receiving parameter maximum value
  */
-void
+Jack_API_EXPORT void
 jackctl_parameter_get_range_constraint(
 	jackctl_parameter_t * parameter,
 	union jackctl_parameter_value * min_ptr,
@@ -598,7 +598,7 @@ jackctl_parameter_get_range_constraint(
  *
  * @return whether parameter constraint is strict.
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_constraint_is_strict(
 	jackctl_parameter_t * parameter);
 
@@ -611,7 +611,7 @@ jackctl_parameter_constraint_is_strict(
  *
  * @return whether parameter constraint is strict.
  */
-bool
+Jack_API_EXPORT bool
 jackctl_parameter_constraint_is_fake_value(
 	jackctl_parameter_t * parameter);
 
@@ -620,7 +620,7 @@ jackctl_parameter_constraint_is_fake_value(
  *
  * @param format string
  */
-void
+Jack_API_EXPORT void
 jack_error(
 	const char *format,
 	...);
@@ -630,7 +630,7 @@ jack_error(
  *
  * @param format string
  */
-void
+Jack_API_EXPORT void
 jack_info(
 	const char *format,
 	...);
@@ -641,7 +641,7 @@ jack_info(
  *
  * @param format string
  */
-void
+Jack_API_EXPORT void
 jack_log(
 	const char *format,
 	...);

@@ -52,7 +52,7 @@ namespace Jack
     \brief Utility functions.
     */
 
-    struct SERVER_EXPORT JackTools
+    struct Jack_API_EXPORT JackTools
     {
         static int GetPID();
         static int GetUID();

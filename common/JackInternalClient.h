@@ -34,7 +34,7 @@ struct JackEngineControl;
 \brief Internal clients in the server.
 */
 
-class JackInternalClient : public JackClient
+class Jack_API_EXPORT JackInternalClient : public JackClient
 {
 
     private:
@@ -65,7 +65,7 @@ typedef int (*InitializeCallback)(jack_client_t*, const char*);
 typedef int (*InternalInitializeCallback)(jack_client_t*, const JSList* params);
 typedef void (*FinishCallback)(void *);
 
-class JackLoadableInternalClient : public JackInternalClient
+class Jack_API_EXPORT JackLoadableInternalClient : public JackInternalClient
 {
 
     protected:
@@ -85,7 +85,7 @@ class JackLoadableInternalClient : public JackInternalClient
 
 };
 
-class JackLoadableInternalClient1 : public JackLoadableInternalClient
+class Jack_API_EXPORT JackLoadableInternalClient1 : public JackLoadableInternalClient
 {
 
     private:
@@ -104,7 +104,7 @@ class JackLoadableInternalClient1 : public JackLoadableInternalClient
 
 };
 
-class JackLoadableInternalClient2 : public JackLoadableInternalClient
+class Jack_API_EXPORT JackLoadableInternalClient2 : public JackLoadableInternalClient
 {
 
     private:

@@ -36,7 +36,7 @@ namespace Jack
 */
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackPort
+class Jack_API_EXPORT JackPort
 {
 
         friend class JackGraphManager;

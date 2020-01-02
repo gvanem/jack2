@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPlatformPlug.h"
 #include "JackSystemDeps.h"
 #include "JackConstants.h"
+#include <jack/jack.h>
 
 #ifdef __CLIENTDEBUG__
 #include <iostream>
@@ -35,7 +36,7 @@ namespace Jack
 {
 
 // Globals used for client management on server or library side.
-struct JackGlobals {
+struct Jack_API_EXPORT JackGlobals {
 
     static jack_tls_key fRealTimeThread;
     static jack_tls_key fNotificationThread;
@@ -56,9 +57,9 @@ struct JackGlobals {
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
-extern SERVER_EXPORT JackGraphManager* GetGraphManager();
-extern SERVER_EXPORT JackEngineControl* GetEngineControl();
-extern SERVER_EXPORT JackSynchro* GetSynchroTable();
+Jack_API_EXPORT JackGraphManager* GetGraphManager();
+Jack_API_EXPORT JackEngineControl* GetEngineControl();
+Jack_API_EXPORT JackSynchro* GetSynchroTable();
 
 } // end of namespace
 

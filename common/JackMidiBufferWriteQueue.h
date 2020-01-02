@@ -28,7 +28,7 @@ namespace Jack {
      * Wrapper class to present a JackMidiBuffer in a write queue interface.
      */
 
-    class SERVER_EXPORT JackMidiBufferWriteQueue: public JackMidiWriteQueue {
+    class Jack_API_EXPORT JackMidiBufferWriteQueue: public JackMidiWriteQueue {
 
     private:
 

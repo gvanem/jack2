@@ -30,7 +30,7 @@ namespace Jack
 \brief The FreeWheel driver : run Jack engine at full speed.
 */
 
-class JackFreewheelDriver : public JackDriver
+class Jack_API_EXPORT JackFreewheelDriver : public JackDriver
 {
     protected:
 

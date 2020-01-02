@@ -148,7 +148,7 @@ int jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], 
 
 // To be used by drivers
 
-SERVER_EXPORT jack_driver_desc_t *            /* Newly allocated driver descriptor, NULL on failure */
+Jack_API_EXPORT jack_driver_desc_t *            /* Newly allocated driver descriptor, NULL on failure */
 jack_driver_descriptor_construct(
     const char * name,          /* Driver name */
     jack_driver_type_t type,    /* Driver type */
@@ -156,7 +156,7 @@ jack_driver_descriptor_construct(
     jack_driver_desc_filler_t * filler); /* Pointer to stack var to be supplied to jack_driver_descriptor_add_parameter() as well.
                                             Can be NULL for drivers that have no parameters. */
 
-SERVER_EXPORT int                            /* 0 on failure */
+Jack_API_EXPORT int                            /* 0 on failure */
 jack_driver_descriptor_add_parameter(
     jack_driver_desc_t * driver_descr,  /* Pointer to driver descriptor as returned by jack_driver_descriptor_construct() */
     jack_driver_desc_filler_t * filler, /* Pointer to the stack var that was supplied to jack_driver_descriptor_add_parameter(). */
@@ -168,18 +168,18 @@ jack_driver_descriptor_add_parameter(
     const char * short_desc,            /* A short (~30 chars) description for the user */
     const char * long_desc);            /* A longer description for the user, if NULL short_desc will be used */
 
-SERVER_EXPORT
+Jack_API_EXPORT
 int jack_constraint_add_enum(
     jack_driver_param_constraint_desc_t ** constraint_ptr_ptr,
     uint32_t * array_size_ptr,
     jack_driver_param_value_t * value_ptr,
     const char * short_desc);
 
-SERVER_EXPORT
+Jack_API_EXPORT
 void jack_constraint_free(jack_driver_param_constraint_desc_t * constraint_ptr);
 
 #define JACK_CONSTRAINT_COMPOSE_ENUM(type) \
-SERVER_EXPORT                              \
+Jack_API_EXPORT                              \
 jack_driver_param_constraint_desc_t *      \
 jack_constraint_compose_enum_ ## type(     \
     uint32_t flags,                        \

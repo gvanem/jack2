@@ -21,7 +21,7 @@
 #define __JackNetWinSocket__
 
 #include "JackNetSocket.h"
-#ifdef __MINGW32__
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdint.h>
@@ -44,10 +44,10 @@ namespace Jack
         const char* msg;
     };
 
-    SERVER_EXPORT const char* PrintError(int error);
+    JackServer_API_EXPORT const char* PrintError(int error);
 
     //JeckNetWinSocket***************************************************************************
-    class SERVER_EXPORT JackNetWinSocket
+    class JackServer_API_EXPORT JackNetWinSocket
     {
         private:
             int fSockfd;

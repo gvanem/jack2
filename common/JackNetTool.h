@@ -235,7 +235,7 @@ namespace Jack
 
     */
 
-    class SERVER_EXPORT NetMidiBuffer
+    class JackServer_API_EXPORT NetMidiBuffer
     {
         private:
 
@@ -278,7 +278,7 @@ namespace Jack
 
 // audio data *********************************************************************************
 
-    class SERVER_EXPORT NetAudioBuffer
+    class JackServer_API_EXPORT NetAudioBuffer
     {
 
         protected:
@@ -334,7 +334,7 @@ namespace Jack
 
     };
 
-    class SERVER_EXPORT NetFloatAudioBuffer : public NetAudioBuffer
+    class JackServer_API_EXPORT NetFloatAudioBuffer : public NetAudioBuffer
     {
 
         private:
@@ -369,7 +369,7 @@ namespace Jack
 
 #include <celt/celt.h>
 
-    class SERVER_EXPORT NetCeltAudioBuffer : public NetAudioBuffer
+    class JackServer_API_EXPORT NetCeltAudioBuffer : public NetAudioBuffer
     {
         private:
 
@@ -412,7 +412,7 @@ namespace Jack
 #include <opus/opus.h>
 #include <opus/opus_custom.h>
 
-    class SERVER_EXPORT NetOpusAudioBuffer : public NetAudioBuffer
+    class JackServer_API_EXPORT NetOpusAudioBuffer : public NetAudioBuffer
     {
         private:
 
@@ -451,7 +451,7 @@ namespace Jack
 
 #endif
 
-    class SERVER_EXPORT NetIntAudioBuffer : public NetAudioBuffer
+    class JackServer_API_EXPORT NetIntAudioBuffer : public NetAudioBuffer
     {
         private:
 
@@ -485,26 +485,26 @@ namespace Jack
     //utility *************************************************************************************
 
     //socket API management
-    SERVER_EXPORT int SocketAPIInit();
-    SERVER_EXPORT int SocketAPIEnd();
+    JackServer_API_EXPORT int SocketAPIInit();
+    JackServer_API_EXPORT int SocketAPIEnd();
     //n<-->h functions
-    SERVER_EXPORT void SessionParamsHToN(session_params_t* src_params, session_params_t* dst_params);
-    SERVER_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params);
-    SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header);
-    SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header);
-    SERVER_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
-    SERVER_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
-    SERVER_EXPORT void TransportDataHToN(net_transport_data_t* src_params, net_transport_data_t* dst_params);
-    SERVER_EXPORT void TransportDataNToH(net_transport_data_t* src_params, net_transport_data_t* dst_params);
+    JackServer_API_EXPORT void SessionParamsHToN(session_params_t* src_params, session_params_t* dst_params);
+    JackServer_API_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params);
+    JackServer_API_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header);
+    JackServer_API_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header);
+    JackServer_API_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
+    JackServer_API_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
+    JackServer_API_EXPORT void TransportDataHToN(net_transport_data_t* src_params, net_transport_data_t* dst_params);
+    JackServer_API_EXPORT void TransportDataNToH(net_transport_data_t* src_params, net_transport_data_t* dst_params);
     //display session parameters
-    SERVER_EXPORT void SessionParamsDisplay(session_params_t* params);
+    JackServer_API_EXPORT void SessionParamsDisplay(session_params_t* params);
     //display packet header
-    SERVER_EXPORT void PacketHeaderDisplay(packet_header_t* header);
+    JackServer_API_EXPORT void PacketHeaderDisplay(packet_header_t* header);
     //get the packet type from a sesion parameters
-    SERVER_EXPORT sync_packet_type_t GetPacketType(session_params_t* params);
+    JackServer_API_EXPORT sync_packet_type_t GetPacketType(session_params_t* params);
     //set the packet type in a session parameters
-    SERVER_EXPORT int SetPacketType(session_params_t* params, sync_packet_type_t packet_type);
+    JackServer_API_EXPORT int SetPacketType(session_params_t* params, sync_packet_type_t packet_type);
     //transport utility
-    SERVER_EXPORT const char* GetTransportState(int transport_state);
-    SERVER_EXPORT void NetTransportDataDisplay(net_transport_data_t* data);
+    JackServer_API_EXPORT const char* GetTransportState(int transport_state);
+    JackServer_API_EXPORT void NetTransportDataDisplay(net_transport_data_t* data);
 }

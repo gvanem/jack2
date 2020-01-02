@@ -29,17 +29,17 @@ namespace Jack
 /*!
 \brief The base class for audio drivers: drivers with audio ports.
 
-A concrete derived class will have to be defined with a real audio driver API, 
+A concrete derived class will have to be defined with a real audio driver API,
 either callback based one (like CoreAudio, PortAudio..) ones or blocking ones (like ALSA).
 
 Most of the generic audio handing code is part of this class :
-    - concrete callback basedd derived subclasses typically have to Open/Close the underlying audio API, 
+    - concrete callback basedd derived subclasses typically have to Open/Close the underlying audio API,
         setup the audio callback and implement the Read/Write methods
-    - concrete blocking based derived subclasses typically have to Open/Close the underlying audio API, 
+    - concrete blocking based derived subclasses typically have to Open/Close the underlying audio API,
         implement the Read/Write methods and "wraps" the driver with the JackThreadDriver class.
 */
 
-class SERVER_EXPORT JackAudioDriver : public JackDriver
+class Jack_API_EXPORT JackAudioDriver : public JackDriver
 {
 
     protected:
@@ -79,7 +79,7 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
                         jack_nframes_t playback_latency);
 
         /*
-            To be called by the underlying driver audio callback, or possibly by a RT thread (using JackThreadedDriver decorator) 
+            To be called by the underlying driver audio callback, or possibly by a RT thread (using JackThreadedDriver decorator)
             when a blocking read/write underlying API is used (like ALSA)
         */
         virtual int Process();

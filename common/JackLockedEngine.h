@@ -75,7 +75,7 @@ catch (...) {
 \brief Locked Engine, access to methods is serialized using a mutex.
 */
 
-class SERVER_EXPORT JackLockedEngine
+class Jack_API_EXPORT JackLockedEngine
 {
     private:
 

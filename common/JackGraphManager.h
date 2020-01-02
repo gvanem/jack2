@@ -37,7 +37,7 @@ namespace Jack
 */
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
+class Jack_API_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
 {
 
     private:

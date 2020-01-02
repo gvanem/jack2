@@ -42,7 +42,7 @@ namespace Jack
         int pos2;
     };
 
-    struct MeasureTable
+    struct Jack_API_EXPORT MeasureTable
     {
 
         Measure fTable[TABLE_MAX];
@@ -62,7 +62,7 @@ namespace Jack
     \brief Base class for audio adapters.
     */
 
-    class JackAudioAdapterInterface
+    class Jack_API_EXPORT JackAudioAdapterInterface
     {
 
     protected:

@@ -29,13 +29,13 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT void InitTime();
-    SERVER_EXPORT void EndTime();
-    SERVER_EXPORT jack_time_t GetMicroSeconds(void);
-    SERVER_EXPORT void JackSleep(long usec);
+    Jack_API_EXPORT void InitTime();
+    Jack_API_EXPORT void EndTime();
+    Jack_API_EXPORT jack_time_t GetMicroSeconds(void);
+    Jack_API_EXPORT void JackSleep(long usec);
 
-    void SetClockSource(jack_timer_type_t source);
-    const char* ClockSourceName(jack_timer_type_t source);
+    Jack_API_EXPORT void SetClockSource(jack_timer_type_t source);
+    Jack_API_EXPORT const char* ClockSourceName(jack_timer_type_t source);
 
 #ifdef __cplusplus
 }

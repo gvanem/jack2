@@ -22,6 +22,7 @@
 #define __JackWinSemaphore__
 
 #include "JackSynchro.h"
+#include "JackCompilerDeps.h"
 #include <windows.h>
 #include <assert.h>
 
@@ -32,7 +33,7 @@ namespace Jack
 \brief Inter process synchronization using system wide semaphore.
 */
 
-class JackWinSemaphore : public detail::JackSynchro
+class Jack_API_EXPORT JackWinSemaphore : public detail::JackSynchro
 {
 
     private:

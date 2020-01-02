@@ -30,7 +30,7 @@ namespace Jack
     \brief Audio adapter : Jack client side.
     */
 
-    class JackAudioAdapter
+    class Jack_API_EXPORT JackAudioAdapter
     {
         private:
 

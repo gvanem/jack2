@@ -31,7 +31,7 @@ namespace Jack
 
 class JackServer;
 
-class JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
+class Jack_API_EXPORT JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
 {
 
     private:
@@ -72,7 +72,7 @@ class JackClientPipeThread : public JackRunnableInterface, public JackClientHand
 \brief JackServerChannel using pipe.
 */
 
-class JackWinNamedPipeServerChannel : public JackRunnableInterface
+class Jack_API_EXPORT JackWinNamedPipeServerChannel : public JackRunnableInterface
 {
 
     private:

@@ -408,7 +408,7 @@ struct JackClientTiming
 */
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackConnectionManager
+class Jack_API_EXPORT JackConnectionManager
 {
 
     private:

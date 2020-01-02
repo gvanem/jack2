@@ -28,6 +28,7 @@ extern "C" {
 #include <jack/weakmacros.h>
 #include <jack/types.h>
 #include <stdlib.h>
+#include "JackCompilerDeps.h"
 
 
 /** Type for raw event data contained in @ref jack_midi_event_t. */
@@ -53,7 +54,7 @@ typedef struct _jack_midi_event
  * @param port_buffer Port buffer from which to retrieve event.
  * @return number of events inside @a port_buffer
  */
-uint32_t
+JackServer_API_EXPORT uint32_t
 jack_midi_get_event_count(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 
@@ -79,7 +80,7 @@ jack_midi_get_event_count(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * @param event_index Index of event to retrieve.
  * @return 0 on success, ENODATA if buffer is empty.
  */
-int
+JackServer_API_EXPORT int
 jack_midi_event_get(jack_midi_event_t *event,
                     void        *port_buffer,
                     uint32_t    event_index) JACK_OPTIONAL_WEAK_EXPORT;
@@ -93,7 +94,7 @@ jack_midi_event_get(jack_midi_event_t *event,
  *
  * @param port_buffer Port buffer to clear (must be an output port buffer).
  */
-void
+JackServer_API_EXPORT void
 jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 /** Reset an event buffer (from data allocated outside of JACK).
@@ -106,7 +107,7 @@ jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @param port_buffer Port buffer to reset.
  */
-void
+JackServer_API_EXPORT void
 jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
@@ -117,7 +118,7 @@ jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
  *
  * @param port_buffer Port buffer to check size of.
  */
-size_t
+JackServer_API_EXPORT size_t
 jack_midi_max_event_size(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 
@@ -140,7 +141,7 @@ jack_midi_max_event_size(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * @return Pointer to the beginning of the reserved event's data buffer, or
  * NULL on error (ie not enough space).
  */
-jack_midi_data_t*
+JackServer_API_EXPORT jack_midi_data_t*
 jack_midi_event_reserve(void *port_buffer,
                         jack_nframes_t  time,
                         size_t data_size) JACK_OPTIONAL_WEAK_EXPORT;
@@ -167,7 +168,7 @@ jack_midi_event_reserve(void *port_buffer,
  * @param data_size Length of @a data in bytes.
  * @return 0 on success, ENOBUFS if there's not enough space in buffer for event.
  */
-int
+JackServer_API_EXPORT int
 jack_midi_event_write(void *port_buffer,
                       jack_nframes_t time,
                       const jack_midi_data_t *data,
@@ -182,7 +183,7 @@ jack_midi_event_write(void *port_buffer,
  * @param port_buffer Port to receive count for.
  * @returns Number of events that could not be written to @a port_buffer.
  */
-uint32_t
+JackServer_API_EXPORT uint32_t
 jack_midi_get_lost_event_count(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/

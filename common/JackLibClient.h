@@ -32,7 +32,7 @@ namespace Jack
 \brief Client on the library side.
 */
 
-class JackLibClient : public JackClient
+class Jack_API_EXPORT JackLibClient : public JackClient
 {
 
     private:
@@ -55,7 +55,7 @@ class JackLibClient : public JackClient
 };
 
 // Used for client-side Metadata API (JackLibAPI.cpp)
-JackMetadata* GetMetadata();
+Jack_API_EXPORT JackMetadata* GetMetadata();
 
 } // end of namespace
 

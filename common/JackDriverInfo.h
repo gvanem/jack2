@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
 
-class SERVER_EXPORT JackDriverInfo
+class Jack_API_EXPORT JackDriverInfo
 {
 
     private:

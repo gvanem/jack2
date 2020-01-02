@@ -29,7 +29,7 @@ namespace Jack {
      * queues are used by processors to transfer data to the next processor.
      */
 
-    class SERVER_EXPORT JackMidiWriteQueue {
+    class Jack_API_EXPORT JackMidiWriteQueue {
 
     public:
 

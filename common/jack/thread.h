@@ -27,6 +27,7 @@ extern "C"
 
 #include <jack/systemdeps.h>
 #include <jack/weakmacros.h>
+#include <jack/export.h>
 
 /* use 512KB stack per thread - the default is way too high to be feasible
  * with mlockall() on many systems */
@@ -49,7 +50,7 @@ extern "C"
  * the priority that any JACK-created client threads will run at.
  * Otherwise returns -1.
  */
-
+Jack_API_EXPORT
 int jack_client_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -57,7 +58,7 @@ int jack_client_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
  * the maximum priority that a JACK client thread should use if the thread
  * is subject to realtime scheduling. Otherwise returns -1.
  */
-
+Jack_API_EXPORT
 int jack_client_max_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -70,6 +71,7 @@ int jack_client_max_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPOR
  * @returns 0, if successful; EPERM, if the calling process lacks
  * required realtime privileges; otherwise some other error number.
  */
+Jack_API_EXPORT
 int jack_acquire_real_time_scheduling (jack_native_thread_t thread, int priority) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -88,6 +90,7 @@ int jack_acquire_real_time_scheduling (jack_native_thread_t thread, int priority
  *
  * @returns 0, if successful; otherwise some error number.
  */
+Jack_API_EXPORT
 int jack_client_create_thread (jack_client_t* client,
                                jack_native_thread_t *thread,
                                int priority,
@@ -102,6 +105,7 @@ int jack_client_create_thread (jack_client_t* client,
  *
  * @returns 0, if successful; otherwise an error number.
  */
+Jack_API_EXPORT
 int jack_drop_real_time_scheduling (jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -111,6 +115,7 @@ int jack_drop_real_time_scheduling (jack_native_thread_t thread) JACK_OPTIONAL_W
  *
  * @returns 0, if successful; otherwise an error number.
  */
+Jack_API_EXPORT
 int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -120,7 +125,8 @@ int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) 
  *
  * @returns 0, if successful; otherwise an error number.
  */
- int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
+Jack_API_EXPORT
+int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 #ifndef _WIN32
 

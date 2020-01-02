@@ -41,7 +41,7 @@ class JackExternalClient;
 \brief Engine description.
 */
 
-class SERVER_EXPORT JackEngine : public JackLockAble
+class Jack_API_EXPORT JackEngine : public JackLockAble
 {
     friend class JackLockedEngine;
 

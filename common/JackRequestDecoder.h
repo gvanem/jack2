@@ -33,7 +33,7 @@ struct JackClientHandlerInterface {
 
     virtual void ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult* res) = 0;
     virtual void ClientRemove(detail::JackChannelTransactionInterface* socket, int refnum) = 0;
-    
+
     virtual ~JackClientHandlerInterface()
     {}
 
@@ -43,7 +43,7 @@ struct JackClientHandlerInterface {
 \brief Request decoder
 */
 
-class JackRequestDecoder
+class Jack_API_EXPORT JackRequestDecoder
 {
     private:
 
