@@ -18,7 +18,6 @@ VERSION   = $(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)
 #
 SRC_ROOT            = $(realpath $(MINGW32))/src
 CELT_ROOT          ?= $(SRC_ROOT)/Sound/Opus
-DB_ROOT            ?= $(SRC_ROOT)/database/gdbm-1.11
 REGEX_ROOT         ?= $(SRC_ROOT)/RegExp/regex-0.12
 LIBSAMPLERATE_ROOT ?= $(SRC_ROOT)/Sound/libsamplerate
 PORTAUDIO_ROOT     ?= $(SRC_ROOT)/Sound/PortAudio
@@ -780,7 +779,7 @@ define win32_config_H
   #include <io.h>
   #include <inttypes.h>
   #include <windows.h>
-  #include <mmsystem.h>
+  #include <mmsystem.h> /* Because of 'WIN32_LEAN_AND_MEAN' above */
   #include <psapi.h>
 
   #define _USE_MATH_DEFINES
@@ -812,26 +811,6 @@ define win32_config_H
     #define strcasecmp(s1, s2)  _stricmp (s1, s2)
     #define strdup(s)           _strdup (s)
     #define alloca(x)           _alloca (x)
-  #else
-    /*
-     * Do not pull in <stdint.h> to keep the noise-level down
-     */
-    // #define _STDINT_H           1
-
-    /*
-     * Some old MinGWs (used by AppVeyor) does not have '_putenv_s()'
-     */
-    #if defined(__MINGW32__) // && (__MINGW32_VERSION <= 3021000L)
-      static inline int fake_putenv_s (const char *name, const char *value)
-      {
-        char sum [1000];
-
-        _snprintf (sum, sizeof(sum), "%s=%s", name, value);
-        putenv (sum);
-        return (0);
-      }
-      #define _putenv_s(name, value) fake_putenv_s (name, value)
-    #endif
   #endif
 
   #define JACK_LOCATION  "./bin"
