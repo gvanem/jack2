@@ -36,6 +36,12 @@ jack_net_master_t* net;
 #define BUFFER_SIZE 512
 #define SAMPLE_RATE 44100
 
+#ifdef _WIN32
+#define jack_usleep(val) Sleep ((val)/1000)
+#else
+#define jack_usleep(val) usleep (val)
+#endif
+
 static void signal_handler(int sig)
 {
 	jack_net_master_close(net);
@@ -130,7 +136,7 @@ main (int argc, char *argv[])
 #endif
 
     // Allocate buffers
-    
+
     audio_input_buffer = (float**)calloc(result.audio_input, sizeof(float*));
     for (i = 0; i < result.audio_input; i++) {
         audio_input_buffer[i] = (float*)calloc(buffer_size, sizeof(float));
@@ -147,13 +153,13 @@ main (int argc, char *argv[])
     WARNING !! : this code is given for demonstration purpose. For proper timing bevahiour
     it has to be called in a real-time context (which is *not* the case here...)
     */
-    
-    //usleep(5*1000000);
+
+    //jack_usleep(5*1000000);
     printf("Wait...\n");
     //sleep(10);
-    usleep(1000000);
+    jack_usleep(1000000);
     printf("Wait...OK\n");
-  
+
   	while (1) {
 
         // Copy input to output
@@ -161,34 +167,34 @@ main (int argc, char *argv[])
         for (i = 0; i < result.audio_input; i++) {
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
-   
+
         /*
         if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
             printf("jack_net_master_send failure, exiting\n");
             break;
         }
-        
-        usleep(10000);
-         
+
+        jack_usleep(10000);
+
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
             printf("jack_net_master_recv failure, exiting\n");
             break;
         }
         */
-        
+
         if (jack_net_master_send_slice(net, result.audio_output, audio_output_buffer, 0, NULL, BUFFER_SIZE/2) < 0) {
             printf("jack_net_master_send failure, exiting\n");
             break;
         }
-        
-        usleep(10000);
-         
+
+        jack_usleep(10000);
+
         if (jack_net_master_recv_slice(net, result.audio_input, audio_input_buffer, 0, NULL, BUFFER_SIZE/2) < 0) {
             printf("jack_net_master_recv failure, exiting\n");
             break;
         }
-        
-        usleep(wait_usec);
+
+        jack_usleep(wait_usec);
 	};
 
     // Wait for application end
