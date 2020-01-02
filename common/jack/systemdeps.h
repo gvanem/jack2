@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         /* POST_PACKED_STRUCTURE needs to be a macro which
            expands into a compiler directive. The directive must
            tell the compiler to arrange the preceding structure
-           declaration so that it is packed on byte-boundaries rather 
+           declaration so that it is packed on byte-boundaries rather
            than use the natural alignment of the processor and/or
            compiler.
         */
@@ -35,7 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         #define POST_PACKED_STRUCTURE __attribute__((__packed__))
 
     #else
-    
+
         #ifdef _MSC_VER
             #define PRE_PACKED_STRUCTURE1 __pragma(pack(push,1))
             #define PRE_PACKED_STRUCTURE    PRE_PACKED_STRUCTURE1
@@ -68,7 +68,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     #ifdef _MSC_VER     /* Microsoft compiler */
         #define __inline__ inline
-        #if (!defined(int8_t) && !defined(_STDINT_H))
+        #if (!defined(int8_t) && !defined(_STDINT_H) && !defined(_STDINT))
             #define __int8_t_defined
             typedef char int8_t;
             typedef unsigned char uint8_t;
@@ -128,14 +128,5 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #undef POST_PACKED_STRUCTURE
     #define POST_PACKED_STRUCTURE
 #endif /* __arm__ || __aarch64__ || __ppc__ || __powerpc__ */
-
-/** define JACK_LIB_EXPORT, useful for internal clients */
-#if defined(_WIN32)
-    #define JACK_LIB_EXPORT __declspec(dllexport)
-#elif defined(__GNUC__)
-    #define JACK_LIB_EXPORT __attribute__((visibility("default")))
-#else
-    #define JACK_LIB_EXPORT
-#endif
 
 #endif /* __jack_systemdeps_h__ */

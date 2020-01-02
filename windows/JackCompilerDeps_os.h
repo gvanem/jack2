@@ -21,26 +21,17 @@
 #ifndef __JackCompilerDeps_WIN32__
 #define __JackCompilerDeps_WIN32__
 
-#define	LIB_EXPORT __declspec(dllexport)
-
-#ifdef SERVER_SIDE
-    #define	SERVER_EXPORT __declspec(dllexport)
-#else
-    #define	SERVER_EXPORT
-#endif
-
 #if __GNUC__
-
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
-    
 #else
-
     #define MEM_ALIGN(x,y) x
- 
 #endif
 
 #if defined(_MSC_VER) /* Added by JE - 31-01-2012 */
+#ifndef strdup
 #define strdup _strdup
+#endif
+
 #if _MSC_VER < 1900
 // This wrapper is not fully standard-compliant.  _snprintf() does not
 // distinguish whether a result is truncated or a format error occurs.
