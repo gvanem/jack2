@@ -28,6 +28,7 @@ ASIOSDK_ROOT       ?= $(SRC_ROOT)/Sound/Portaudio/old-stuff/ASIOSDK
 #
 # Build options. Do a 'make realclean' after changing these.
 #
+USE_ASIO         ?= 0
 USE_CELT         ?= 0
 USE_CRT_DEBUG    ?= 0
 USE_MONITOR      ?= 1
@@ -82,7 +83,7 @@ ifeq ($(CC),gcc)
   #
   CELT_LIB        = $(CELT_ROOT)/libcelt.a
   REGEX_LIB       = $(REGEX_ROOT)/libregex.a
-  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/../libsamplerate-0.a
+  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/libsamplerate-0.a
   PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
   PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
 
@@ -102,7 +103,7 @@ else
   #
   CELT_LIB        = $(CELT_ROOT)/celt.lib
   REGEX_LIB       = $(REGEX_ROOT)/regex.lib
-  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/../libsamplerate-0.lib
+  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/libsamplerate-0.lib
   PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
   PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
 endif
@@ -134,10 +135,9 @@ else ifeq ($(CC),cl)
   CFLAGS += -wd4005 -wd4200 -wd4244 -wd4101 -wd4251 -wd4275 -wd4521 -wd4522
 
 else ifeq ($(CC),gcc)
-  CFLAGS += -fmax-errors=5               \
-            -Wno-unused-variable         \
-            -Wno-unused-but-set-variable \
-            -Wno-incompatible-pointer-types
+  CFLAGS += -fmax-errors=5       \
+            -Wno-unused-variable \
+            -Wno-unused-but-set-variable
 endif
 
 CFLAGS += -I.               \
@@ -147,6 +147,17 @@ CFLAGS += -I.               \
           -I./compat/alloca \
           -I$(REGEX_ROOT)
 
+#
+# This depends on how the '$(PORTAUDIO_LIB)' was built.
+# Change to suite. Untested.
+#
+ifeq ($(USE_ASIO),1)
+  CFLAGS += -DHAVE_ASIO
+endif
+
+#
+# Due to the generated <unistd.h>.
+#
 ifneq ($(CC),gcc)
   CFLAGS += -I./$(OBJ_DIR)
 endif
@@ -494,7 +505,7 @@ bin/libJackServer.dll:: $(libJackServer_OBJ) $(OBJ_DIR)/libJackServer.res lib/li
 # All internal and external drivers are put in 'bin/jack'.
 # Internal and external drivers have different exported symbol names.
 #
-INTERNAL_CLIENT_EXPORTS = jack_finish jack_get_descriptor jack_initialize jack_internal_initialize
+INTERNAL_CLIENT_EXPORTS = jack_get_descriptor jack_finish jack_initialize jack_internal_initialize
 EXTERNAL_CLIENT_EXPORTS = driver_get_descriptor driver_initialize
 
 bin/jack/audioAdapter.dll: $(jack_audioAdapter_OBJ) $(OBJ_DIR)/JackAudioAdapter.res lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PORTAUDIO_LIB)
@@ -572,7 +583,7 @@ bin/jack_%.exe: $(OBJ_DIR)/%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
 #
 ifeq ($(CC),gcc)
   CXXFLAGS     = -std=c++11
-  _C_compile   = gcc $(CFLAGS) -o $(2) -c $(1)
+  _C_compile   = gcc $(CFLAGS) -Wno-incompatible-pointer-types -o $(2) -c $(1)
   _CPP_compile = g++ $(CFLAGS) -o $(2) -c $(1)
 else
   CXXFLAGS     = -TP -EHsc
@@ -805,6 +816,13 @@ define win32_config_H
      * Do not pull in <stdint.h> to keep the noise-level down
      */
     // #define _STDINT_H           1
+
+    /*
+     * Some MinGWs have problems with seeing this in C++ mode?!
+     */
+    #ifdef __cplusplus
+      extern "C" __declspec(dllimport) errno_t __cdecl _putenv_s (const char *_Name,const char *_Value);
+    #endif
   #endif
 
   #define JACK_LOCATION  "./bin"
