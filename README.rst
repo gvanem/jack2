@@ -4,7 +4,7 @@
 .. image:: https://travis-ci.org/jackaudio/jack2.svg?branch=master
    :target: https://travis-ci.org/jackaudio/jack2
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/gvanem/Jack2?branch=master&svg=true)](https://ci.appveyor.com/project/gvanem/Jack2)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/gvanem/jack2?branch=master&svg=true)](https://ci.appveyor.com/project/gvanem/jack2)
 
 
 My fork aims to get Jack2 compiled using MSVC and/or clang-cl.
