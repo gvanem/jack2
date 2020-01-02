@@ -56,7 +56,6 @@ inprocess (jack_nframes_t nframes, void *arg)
  * @return 0 if successful; otherwise jack_finish() will be called and
  * the client terminated immediately.
  */
-JACK_LIB_EXPORT
 int
 jack_initialize (jack_client_t *client, const char *load_init)
 {
@@ -78,7 +77,7 @@ jack_initialize (jack_client_t *client, const char *load_init)
 
 	/* join the process() cycle */
 	jack_activate (client);
-	
+
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsOutput);
 	if (ports == NULL) {
@@ -89,20 +88,20 @@ jack_initialize (jack_client_t *client, const char *load_init)
 	if (jack_connect (client, ports[0], jack_port_name (pp->input_port))) {
 		fprintf (stderr, "cannot connect input ports\n");
 	}
-	
+
 	jack_free (ports);
-	
+
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsInput);
 	if (ports == NULL) {
 		fprintf(stderr, "no physical playback ports\n");
 		return 1;		/* terminate client */
 	}
-	
+
 	if (jack_connect (client, jack_port_name (pp->output_port), ports[0])) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
-	
+
 	jack_free (ports);
 
 	return 0;			/* success */
@@ -116,7 +115,6 @@ jack_initialize (jack_client_t *client, const char *load_init)
  *
  * @param arg the same parameter provided to inprocess().
  */
-JACK_LIB_EXPORT
 void
 jack_finish (void *arg)
 {
