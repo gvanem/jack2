@@ -2,11 +2,11 @@
 #define jack_export_h
 
 #if defined(_WIN32)
-  #define DLL_EXPORT __declspec(dllexport)
-  #define DLL_IMPORT __declspec(dllimport)
+  #define Jack_DLL_EXPORT __declspec(dllexport)
+  #define Jack_DLL_IMPORT __declspec(dllimport)
 #else
-  #define DLL_EXPORT
-  #define DLL_IMPORT
+  #define Jack_DLL_EXPORT
+  #define Jack_DLL_IMPORT
 #endif
 
 /*
@@ -14,18 +14,18 @@
  * that go into 'bin/libJack.dll'.
  */
 #if defined(BUILDING_JACK_DLL)
-  #define Jack_API_EXPORT  DLL_EXPORT
+  #define Jack_API_EXPORT  Jack_DLL_EXPORT
 #else
-  #define Jack_API_EXPORT  DLL_IMPORT
+  #define Jack_API_EXPORT  Jack_DLL_IMPORT
 #endif
 
 /*
  * Similarily for 'bin/libJackServer.dll'.
  */
 #if defined(BUILDING_JACK_SERVER_DLL)
-  #define JackServer_API_EXPORT  DLL_EXPORT
+  #define JackServer_API_EXPORT  Jack_DLL_EXPORT
 #else
-  #define JackServer_API_EXPORT  DLL_IMPORT
+  #define JackServer_API_EXPORT  Jack_DLL_IMPORT
 #endif
 
 /*
@@ -34,16 +34,16 @@
  *   need to be exported from both .DLLs. Rather confusing, but true.
  */
 #if defined(BUILDING_JACK_DLL) || defined(BUILDING_JACK_SERVER_DLL)
-  #define JackDual_API_EXPORT  DLL_EXPORT
+  #define JackDual_API_EXPORT  Jack_DLL_EXPORT
 #else
-  #define JackDual_API_EXPORT  DLL_IMPORT
+  #define JackDual_API_EXPORT  Jack_DLL_IMPORT
 #endif
 
 /*
-  For drivers like 'bin/jack/jack_dummy.dll', there is no need to add
-  * '-DBUILDING_JACK_DUMMY_DLL' since the needed symbols are exported using
-  * the macro '$(call link_DLL_driver, ..)'.
-  *
-  * Also note, for non-Windows, this file should do nothing.
-  */
+ * For drivers like 'bin/jack/jack_dummy.dll', there is no need to add
+ * '-DBUILDING_JACK_DUMMY_DLL' since the needed symbols are exported using
+ * the macro '$(call link_DLL_driver, ..)'.
+ *
+ * Also note, for non-Windows, this file should do nothing.
+ */
 #endif
