@@ -1,8 +1,6 @@
-`JACK2 <http://jackaudio.org/>`_
-################################
+# [JACK2](http://jackaudio.org)
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/gvanem/jack2?branch=master&svg=true)](https://ci.appveyor.com/project/gvanem/jack2)
-
 
 My fork aims to get Jack2 compiled using MSVC and/or clang-cl.
 The main differences are mostly related to the horrid `LIB_EXPORT` anf
