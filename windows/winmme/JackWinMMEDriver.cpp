@@ -362,7 +362,7 @@ extern "C"
     // singleton kind of driver
     static Jack::JackWinMMEDriver* driver = NULL;
 
-    DLL_EXPORT jack_driver_desc_t * driver_get_descriptor()
+    jack_driver_desc_t * driver_get_descriptor()
     {
         return jack_driver_descriptor_construct("winmme", JackDriverSlave, "WinMME API based MIDI backend", NULL);
     }

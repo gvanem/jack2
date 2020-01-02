@@ -354,158 +354,153 @@ error:
 
 } // end of namespace
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "JackCompilerDeps.h"
 
-    jack_driver_desc_t* driver_get_descriptor()
+extern "C" {
+
+jack_driver_desc_t* driver_get_descriptor()
+{
+    jack_driver_desc_t * desc;
+    jack_driver_desc_filler_t filler;
+    jack_driver_param_value_t value;
+
+    desc = jack_driver_descriptor_construct("portaudio", JackDriverMaster, "PortAudio API based audio backend", &filler);
+
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamUInt, &value, NULL, "Maximum number of channels", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Maximum number of input channels", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Maximum number of output channels", NULL);
+
+    jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports. Optionally set PortAudio device name", NULL);
+
+    jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports. Optionally set PortAudio device name", NULL);
+
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
+
+    value.i = true;
+    jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
+
+    value.ui = 44100U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
+
+    value.ui = 512U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", "Frames per period. If 0 and ASIO driver, will take preferred value");
+
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "PortAudio device name", NULL);
+
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency", NULL);
+
+    value.i = true;
+    jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available PortAudio devices", NULL);
+
+    return desc;
+}
+
+Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
+{
+    jack_nframes_t srate = 44100;
+    jack_nframes_t frames_per_interrupt = 512;
+    const char* capture_pcm_name = "";
+    const char* playback_pcm_name = "";
+    bool capture = false;
+    bool playback = false;
+    int chan_in = 0;
+    int chan_out = 0;
+    bool monitor = false;
+    const JSList *node;
+    const jack_driver_param_t *param;
+    jack_nframes_t systemic_input_latency = 0;
+    jack_nframes_t systemic_output_latency = 0;
+    PortAudioDevices* pa_devices = new PortAudioDevices();
+
+    for (node = params; node; node = jack_slist_next(node))
     {
-        jack_driver_desc_t * desc;
-        jack_driver_desc_filler_t filler;
-        jack_driver_param_value_t value;
+        param = (const jack_driver_param_t *) node->data;
 
-        desc = jack_driver_descriptor_construct("portaudio", JackDriverMaster, "PortAudio API based audio backend", &filler);
+        switch (param->character) {
 
-        value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamUInt, &value, NULL, "Maximum number of channels", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Maximum number of input channels", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Maximum number of output channels", NULL);
+        case 'd':
+            capture_pcm_name = param->value.str;
+            playback_pcm_name = param->value.str;
+            break;
 
-        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports. Optionally set PortAudio device name", NULL);
-
-        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports. Optionally set PortAudio device name", NULL);
-
-        value.i = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
-
-        value.i = true;
-        jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
-
-        value.ui = 44100U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
-
-        value.ui = 512U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", "Frames per period. If 0 and ASIO driver, will take preferred value");
-
-        jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "PortAudio device name", NULL);
-
-        value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency", NULL);
-
-        value.i = true;
-        jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available PortAudio devices", NULL);
-
-        return desc;
-    }
-
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
-    {
-        jack_nframes_t srate = 44100;
-        jack_nframes_t frames_per_interrupt = 512;
-        const char* capture_pcm_name = "";
-        const char* playback_pcm_name = "";
-        bool capture = false;
-        bool playback = false;
-        int chan_in = 0;
-        int chan_out = 0;
-        bool monitor = false;
-        const JSList *node;
-        const jack_driver_param_t *param;
-        jack_nframes_t systemic_input_latency = 0;
-        jack_nframes_t systemic_output_latency = 0;
-        PortAudioDevices* pa_devices = new PortAudioDevices();
-
-        for (node = params; node; node = jack_slist_next(node))
-        {
-            param = (const jack_driver_param_t *) node->data;
-
-            switch (param->character) {
-
-            case 'd':
-                capture_pcm_name = param->value.str;
-                playback_pcm_name = param->value.str;
-                break;
-
-            case 'D':
-                capture = true;
-                playback = true;
-                break;
-
-            case 'c':
-                chan_in = chan_out = (int)param->value.ui;
-                break;
-
-            case 'i':
-                chan_in = (int)param->value.ui;
-                break;
-
-            case 'o':
-                chan_out = (int)param->value.ui;
-                break;
-
-            case 'C':
-                capture = true;
-                if (strcmp(param->value.str, "none") != 0) {
-                    capture_pcm_name = param->value.str;
-                }
-                break;
-
-            case 'P':
-                playback = true;
-                if (strcmp(param->value.str, "none") != 0) {
-                    playback_pcm_name = param->value.str;
-                }
-                break;
-
-            case 'm':
-                monitor = param->value.i;
-                break;
-
-            case 'r':
-                srate = param->value.ui;
-                break;
-
-            case 'p':
-                frames_per_interrupt = (unsigned int)param->value.ui;
-                break;
-
-            case 'I':
-                systemic_input_latency = param->value.ui;
-                break;
-
-            case 'O':
-                systemic_output_latency = param->value.ui;
-                break;
-
-            case 'l':
-                pa_devices->DisplayDevicesNames();
-                // Stops the server in this case
-                return NULL;
-            }
-        }
-
-        // duplex is the default
-        if (!capture && !playback) {
+        case 'D':
             capture = true;
             playback = true;
-        }
+            break;
 
-        Jack::JackDriverClientInterface* driver = new Jack::JackPortAudioDriver("system", "portaudio", engine, table, pa_devices);
-        if (driver->Open(frames_per_interrupt, srate, capture, playback,
-            chan_in, chan_out, monitor, capture_pcm_name,
-            playback_pcm_name, systemic_input_latency,
-            systemic_output_latency) == 0) {
-            return driver;
-        } else {
-            delete driver;
+        case 'c':
+            chan_in = chan_out = (int)param->value.ui;
+            break;
+
+        case 'i':
+            chan_in = (int)param->value.ui;
+            break;
+
+        case 'o':
+            chan_out = (int)param->value.ui;
+            break;
+
+        case 'C':
+            capture = true;
+            if (strcmp(param->value.str, "none") != 0) {
+                capture_pcm_name = param->value.str;
+            }
+            break;
+
+        case 'P':
+            playback = true;
+            if (strcmp(param->value.str, "none") != 0) {
+                playback_pcm_name = param->value.str;
+            }
+            break;
+
+        case 'm':
+            monitor = param->value.i;
+            break;
+
+        case 'r':
+            srate = param->value.ui;
+            break;
+
+        case 'p':
+            frames_per_interrupt = (unsigned int)param->value.ui;
+            break;
+
+        case 'I':
+            systemic_input_latency = param->value.ui;
+            break;
+
+        case 'O':
+            systemic_output_latency = param->value.ui;
+            break;
+
+        case 'l':
+            pa_devices->DisplayDevicesNames();
+            // Stops the server in this case
             return NULL;
         }
     }
 
-#ifdef __cplusplus
+    // duplex is the default
+    if (!capture && !playback) {
+        capture = true;
+        playback = true;
+    }
+
+    Jack::JackDriverClientInterface* driver = new Jack::JackPortAudioDriver("system", "portaudio", engine, table, pa_devices);
+    if (driver->Open(frames_per_interrupt, srate, capture, playback,
+        chan_in, chan_out, monitor, capture_pcm_name,
+        playback_pcm_name, systemic_input_latency,
+        systemic_output_latency) == 0) {
+        return driver;
+    } else {
+        delete driver;
+        return NULL;
+    }
 }
-#endif
+
+} // extern "C"

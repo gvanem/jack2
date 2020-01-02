@@ -31,6 +31,7 @@ extern "C"
 
 #include "JackCompilerDeps.h"
 #include "JackSystemDeps.h"
+#include "types.h"
 
 #define JACK_DRIVER_NAME_MAX          15
 #define JACK_DRIVER_PARAM_NAME_MAX    15
@@ -192,9 +193,22 @@ JACK_CONSTRAINT_COMPOSE_ENUM(str);
 
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 
+/* Prototype these external driver functions here. And only here please.
+ */
+jack_driver_desc_t* jack_get_descriptor();
+int                 jack_initialize(jack_client_t* jack_client, const char* load_init);
+int                 jack_internal_initialize(jack_client_t* client, const JSList* params);
+void                jack_finish(void* arg);
+
+/* Prototypes for internal driver functions is a bit tricky to add here.
+ * Except for this one. But all exported `driver_x()` functions MUST have
+ * plain "C" (__cdecl) linkage.
+ */
+jack_driver_desc_t * driver_get_descriptor();
+
 #ifdef __cplusplus
 }
-#endif
+#endif /* extern "C" */
 
 #endif /* __jack_driver_interface_h__ */
 

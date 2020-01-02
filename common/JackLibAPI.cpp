@@ -32,37 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 using namespace Jack;
 
-#if 0     /* Already in 'common/jack/jack.h' */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-    Jack_API_EXPORT jack_client_t * jack_client_new_aux (const char *client_name,
-                                                         jack_options_t options,
-                                                         jack_status_t *status);
-
-    Jack_API_EXPORT jack_client_t * jack_client_open (const char *client_name,
-                                                      jack_options_t options,
-                                                      jack_status_t *status, ...);
-    Jack_API_EXPORT int jack_client_close (jack_client_t *client);
-    Jack_API_EXPORT int jack_get_client_pid (const char *name);
-
-    Jack_API_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t subject, const char* key, const char* value, const char* type);
-    Jack_API_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type);
-    Jack_API_EXPORT void jack_free_description(jack_description_t* desc, int free_description_itself);
-    Jack_API_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc);
-    Jack_API_EXPORT int jack_get_all_properties(jack_description_t** descs);
-    Jack_API_EXPORT int jack_remove_property(jack_client_t* client, jack_uuid_t subject, const char* key);
-    Jack_API_EXPORT int jack_remove_properties(jack_client_t* client, jack_uuid_t subject);
-    Jack_API_EXPORT int jack_remove_all_properties(jack_client_t* client);
-    Jack_API_EXPORT int jack_set_property_change_callback(jack_client_t* client, JackPropertyChangeCallback callback, void* arg);
-
-#ifdef __cplusplus
-}
-#endif
-#endif
-
 static jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
