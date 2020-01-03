@@ -142,6 +142,7 @@ else ifeq ($(CC),gcc)
   ifeq ($(USER),AppVeyor)
     CFLAGS += -Wno-format              \
               -Wno-format-extra-args   \
+              -Wno-write-strings       \
               -Wno-stringop-truncation \
               -Wno-address-of-packed-member
   endif

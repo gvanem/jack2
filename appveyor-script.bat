@@ -22,9 +22,12 @@ set SAMPLERATE_LIB=./windows/Release/bin/libsamplerate_x86.a
 ::
 set MAKE=make -f Makefile.Windows USE_PTHREADS=0
 
+::
+:: Tested in Makefile.Windows.
+::
+set USER=AppVeyor
+
 if %1. == build. (
-  echo User: %USER%
-  echo -------------------------------
   %MAKE% CC=gcc all
   goto :EOF
 )
