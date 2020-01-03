@@ -135,6 +135,16 @@ else ifeq ($(CC),gcc)
             -Wno-unused-variable         \
             -Wno-unused-but-set-variable \
             -Wno-deprecated-declarations
+
+  #
+  # The AppVeyor build uses gcc 9.1 which causes a lot more warnings.
+  #
+  ifeq ($(USER),AppVeyor)
+    CFLAGS += -Wno-format              \
+              -Wno-format-extra-args   \
+              -Wno-stringop-truncation \
+              -Wno-address-of-packed-member
+  endif
 endif
 
 CFLAGS += -I.               \
@@ -582,7 +592,7 @@ bin/jack_%.exe: $(OBJ_DIR)/%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
 #
 ifeq ($(CC),gcc)
   CXXFLAGS     = -std=c++11
-  _C_compile   = gcc $(CFLAGS) -Wno-incompatible-pointer-types -o $(2) -c $(1)
+  _C_compile   = gcc $(CFLAGS) -Wno-incompatible-pointer-types -Wno-int-conversion -o $(2) -c $(1)
   _CPP_compile = g++ $(CFLAGS) -o $(2) -c $(1)
 else
   CXXFLAGS     = -TP -EHsc

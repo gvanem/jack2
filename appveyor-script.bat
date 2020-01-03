@@ -23,7 +23,8 @@ set SAMPLERATE_LIB=./windows/Release/bin/libsamplerate_x86.a
 set MAKE=make -f Makefile.Windows USE_PTHREADS=0
 
 if %1. == build. (
-  gcc -v
+  echo User: %USER%
+  echo -------------------------------
   %MAKE% CC=gcc all
   goto :EOF
 )
