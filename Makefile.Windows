@@ -16,13 +16,12 @@ VERSION   = $(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)
 #
 # Change 'x_ROOT' to suite:
 #
-SRC_ROOT            = $(realpath $(MINGW32))/src
-CELT_ROOT          ?= $(SRC_ROOT)/Sound/Opus
-REGEX_ROOT         ?= $(SRC_ROOT)/RegExp/regex-0.12
-LIBSAMPLERATE_ROOT ?= $(SRC_ROOT)/Sound/libsamplerate
-PORTAUDIO_ROOT     ?= $(SRC_ROOT)/Sound/PortAudio
-PTHREADS_ROOT      ?= $(SRC_ROOT)/pthreads-w32-2-9-1-release/Pre-built.2
-ASIOSDK_ROOT       ?= $(SRC_ROOT)/Sound/Portaudio/old-stuff/ASIOSDK
+SRC_ROOT         = $(realpath $(MINGW32))/src
+CELT_ROOT       ?= $(SRC_ROOT)/Sound/Opus
+SAMPLERATE_ROOT ?= $(SRC_ROOT)/Sound/libsamplerate
+PORTAUDIO_ROOT  ?= $(SRC_ROOT)/Sound/PortAudio
+PTHREADS_ROOT   ?= $(SRC_ROOT)/pthreads-w32-2-9-1-release/Pre-built.2
+ASIOSDK_ROOT    ?= $(SRC_ROOT)/Sound/Portaudio/old-stuff/ASIOSDK
 
 #
 # Build options. Do a 'make realclean' after changing these.
@@ -36,7 +35,7 @@ USE_WSOCK_TRACE  ?= 0
 USE_MP_COMPILE   ?= 1
 USE_CLANG_FORMAT ?= 1
 
-VPATH = common windows windows/portaudio windows/winmme windows/JackRouter example-clients
+VPATH = common windows windows/portaudio windows/winmme windows/JackRouter compat/regex example-clients
 
 #
 # The following codes used in macro 'colour_msg' assumes you have
@@ -81,8 +80,7 @@ ifeq ($(CC),gcc)
   # These are all static libraries:
   #
   CELT_LIB        = $(CELT_ROOT)/libcelt.a
-  REGEX_LIB       = $(REGEX_ROOT)/libregex.a
-  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/libsamplerate-0.a
+  SAMPLERATE_LIB ?= $(SAMPLERATE_ROOT)/libsamplerate-0.a
   PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
   PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
 
@@ -101,8 +99,7 @@ else
   # These are all static libraries:
   #
   CELT_LIB        = $(CELT_ROOT)/celt.lib
-  REGEX_LIB       = $(REGEX_ROOT)/regex.lib
-  SAMPLERATE_LIB ?= $(LIBSAMPLERATE_ROOT)/libsamplerate-0.lib
+  SAMPLERATE_LIB ?= $(SAMPLERATE_ROOT)/libsamplerate-0.lib
   PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
   PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
 endif
@@ -145,7 +142,7 @@ CFLAGS += -I.               \
           -I./common/jack   \
           -I./windows       \
           -I./compat/alloca \
-          -I$(REGEX_ROOT)
+          -I./compat/regex
 
 #
 # This depends on how the '$(PORTAUDIO_LIB)' was built.
@@ -167,7 +164,7 @@ endif
 # Do the same for 'libsamplerate'.
 #
 CFLAGS += -I$(PORTAUDIO_ROOT)/include \
-          -I$(LIBSAMPLERATE_ROOT)/src \
+          -I$(SAMPLERATE_ROOT)/src    \
           -I./windows/portaudio
 
 #
@@ -362,6 +359,8 @@ libJack_SRC = $(addprefix common/,                      \
                 shm.c                                   \
                 ringbuffer.c)                           \
                                                         \
+              compat/regex/regex.c                      \
+                                                        \
               $(addprefix windows/,                     \
                 JackMMCSS.cpp                           \
                 JackWinMutex.cpp                        \
@@ -495,7 +494,7 @@ $(jack_router_OBJ)   $(jack_router_I):   CFLAGS += -I$(ASIOSDK_ROOT)/common -DWI
 lib/libJack$(IMPLIB):       bin/libJack.dll
 lib/libJackServer$(IMPLIB): bin/libJackServer.dll
 
-bin/libJack.dll: $(libJack_OBJ) $(GETOPT_OBJ) $(OBJ_DIR)/libJack.res $(REGEX_LIB) $(SAMPLERATE_LIB)
+bin/libJack.dll: $(libJack_OBJ) $(GETOPT_OBJ) $(OBJ_DIR)/libJack.res $(SAMPLERATE_LIB)
 	$(call link_DLL, $@, lib/libJack$(IMPLIB), $^ $(call sys_libs, advapi32.lib winmm.lib psapi.lib shell32.lib))
 
 bin/libJackServer.dll:: $(libJackServer_OBJ) $(OBJ_DIR)/libJackServer.res lib/libJack$(IMPLIB)
@@ -767,7 +766,7 @@ define win32_config_H
   #endif
 
   #ifndef _WIN32_WINNT
-  #define _WIN32_WINNT 0x0600   /* We need Vista+ functions */
+  #define _WIN32_WINNT 0x0600   /* Vista+ API */
   #endif
 
   #include <stddef.h>
@@ -776,6 +775,7 @@ define win32_config_H
   #include <string.h>
   #include <malloc.h>
   #include <signal.h>
+  #include <ctype.h>
   #include <io.h>
   #include <inttypes.h>
   #include <windows.h>
@@ -789,8 +789,7 @@ define win32_config_H
   #undef  __argc
 
   #define HAVE_STRUCT_TIMESPEC 1  /* For <pthreads.h> */
-  #define REGEX_MALLOC         1  /* If we compile '$(REGEX_ROOT)/regex.c' directly here */
-  #define HAVE_STRING_H        1
+  #define REGEX_MALLOC         1  /* Since we compile 'compat/regex/regex.c' directly here */
   #define HAVE_SAMPLERATE      1
 
   #ifndef SIGQUIT
@@ -811,6 +810,10 @@ define win32_config_H
     #define strcasecmp(s1, s2)  _stricmp (s1, s2)
     #define strdup(s)           _strdup (s)
     #define alloca(x)           _alloca (x)
+    #define isascii(x)          __isascii(x)
+
+  #elif defined(__MINGW32__) && (__MINGW32_VERSION <= 3021000L)
+    #define snprintf _snprintf
   #endif
 
   #define JACK_LOCATION  "./bin"
@@ -1135,10 +1138,9 @@ dep_replace = sed -e 's|^\(.*\)\.o: |\n$(strip $(1))\1\.$$(O): |' \
 #
 # Replace '$(X_ROOT)' with '$$(X_ROOT)' in case these directories changes.
 #
-dep_replace += -e 's|$(REGEX_ROOT)|$$(REGEX_ROOT)|g'                 \
-               -e 's|$(LIBSAMPLERATE_ROOT)|$$(LIBSAMPLERATE_ROOT)|g' \
-               -e 's|$(PORTAUDIO_ROOT)|$$(PORTAUDIO_ROOT)|g'         \
-               -e 's|$(PTHREADS_ROOT)|$$(PTHREADS_ROOT)|g'           \
+dep_replace += -e 's|$(SAMPLERATE_ROOT)|$$(SAMPLERATE_ROOT)|g' \
+               -e 's|$(PORTAUDIO_ROOT)|$$(PORTAUDIO_ROOT)|g'   \
+               -e 's|$(PTHREADS_ROOT)|$$(PTHREADS_ROOT)|g'     \
                -e 's|$(ASIOSDK_ROOT)|$$(ASIOSDK_ROOT)|g'
 
 #
