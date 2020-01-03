@@ -6,3 +6,6 @@ __pycache__
 android/.server/
 android/.client/
 codeBlocks
+windows/JackRouter/psapi-orig.dll
+windows/JackRouter/psapi-orig.h
+windows/JackRouter/psapi-orig.lib
