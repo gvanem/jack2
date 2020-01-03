@@ -334,7 +334,7 @@ libJack_SRC = $(addprefix common/,                      \
                 JackLibClient.cpp                       \
                 JackLibSampleRateResampler.cpp          \
                 JackMessageBuffer.cpp                   \
-                JackMetaData.cpp                        \
+                JackMetadata.cpp                        \
                 JackMidiPort.cpp                        \
                 JackMidiAsyncQueue.cpp                  \
                 JackMidiAsyncWaitQueue.cpp              \
