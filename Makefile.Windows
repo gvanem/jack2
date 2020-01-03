@@ -558,34 +558,35 @@ bin/JackRouter.dll: $(jack_router_OBJ) $(OBJ_DIR)/JackRouter.res lib/libJack$(IM
 #
 # Programs:
 #
-bin/jack_netmaster.exe: $(OBJ_DIR)/netmaster.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB)
+bin/jack_netmaster.exe: $(OBJ_DIR)/netmaster.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB) # $(OBJ_DIR)/jack_netmaster.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_netslave.exe: $(OBJ_DIR)/netslave.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB)
+bin/jack_netslave.exe: $(OBJ_DIR)/netslave.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB) # $(OBJ_DIR)/jack_netslave.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_netsource.exe: $(OBJ_DIR)/netsource.$(O) $(OBJ_DIR)/netjack_packet.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(SAMPLERATE_LIB)
+bin/jack_netsource.exe: $(OBJ_DIR)/netsource.$(O) $(OBJ_DIR)/netjack_packet.$(O) $(GETOPT_OBJ) \
+                        lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(SAMPLERATE_LIB) # $(OBJ_DIR)/jack_netsource.res
 	$(call link_EXE, $@, $^ $(WS2_32_LIB))
 
-bin/jackd.exe: $(OBJ_DIR)/JackDmp.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+bin/jackd.exe: $(OBJ_DIR)/JackDmp.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jackd.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_disconnect.exe: $(OBJ_DIR)/connect.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+bin/jack_disconnect.exe: $(OBJ_DIR)/connect.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_disconnect.res
  	$(call link_EXE, $@, $^)
 
-bin/jack_load.exe: $(OBJ_DIR)/ipload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+bin/jack_load.exe: $(OBJ_DIR)/ipload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_load.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_unload.exe: $(OBJ_DIR)/ipunload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+bin/jack_unload.exe: $(OBJ_DIR)/ipunload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_unload.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_midi_dump.exe: $(OBJ_DIR)/midi_dump.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PTHREADS_LIB)
+bin/jack_midi_dump.exe: $(OBJ_DIR)/midi_dump.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PTHREADS_LIB) # $(OBJ_DIR)/jack_midi_dump.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_midi_latency_test.exe: $(OBJ_DIR)/midi_latency_test.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB)
+bin/jack_midi_latency_test.exe: $(OBJ_DIR)/midi_latency_test.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) # $(OBJ_DIR)/jack_midi_latency_test.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_%.exe: $(OBJ_DIR)/%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+bin/jack_%.exe: $(OBJ_DIR)/%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_%.res
 	$(call link_EXE_def, $@, $^)
 
 #
@@ -639,43 +640,46 @@ $(OBJ_DIR)/%.res: $(OBJ_DIR)/%.rc
 	$(call make_res, $@, $<)
 
 $(OBJ_DIR)/libJack.rc:
-	$(call make_rc_file, $@, "Jack client library")
+	$(call make_rc_file, $@, "Jack client library", VFT_DLL)
 
 $(OBJ_DIR)/libJackServer.rc:
-	$(call make_rc_file, $@, "Jack server library")
+	$(call make_rc_file, $@, "Jack server library", VFT_DLL)
 
 $(OBJ_DIR)/JackAudioAdapter.rc:
-	$(call make_rc_file, $@, "Jackmp Audio Adapter Driver")
+	$(call make_rc_file, $@, "Jackmp Audio Adapter Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackDummyDriver.rc:
-	$(call make_rc_file, $@, "Jackmp Dummy Driver")
+	$(call make_rc_file, $@, "Jackmp Dummy Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackLoopBackDriver.rc:
-	$(call make_rc_file, $@, "Jackmp Loopback Driver")
+	$(call make_rc_file, $@, "Jackmp Loopback Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackNetAdapter.rc:
-	$(call make_rc_file, $@, "Jackmp NetAdapter Driver")
+	$(call make_rc_file, $@, "Jackmp NetAdapter Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackNetDriver.rc:
-	$(call make_rc_file, $@, "Jackmp Net Driver")
+	$(call make_rc_file, $@, "Jackmp Net Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackNetManager.rc:
-	$(call make_rc_file, $@, "Jackmp NetManager Driver")
+	$(call make_rc_file, $@, "Jackmp NetManager Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackNetoneDriver.rc:
-	$(call make_rc_file, $@, "Jackmp NetOne Driver")
+	$(call make_rc_file, $@, "Jackmp NetOne Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackPortAudio.rc:
-	$(call make_rc_file, $@, "Jackmp PortAudio Driver")
+	$(call make_rc_file, $@, "Jackmp PortAudio Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackProfiler.rc:
-	$(call make_rc_file, $@, "Jack Profiler Driver")
+	$(call make_rc_file, $@, "Jack Profiler Driver", VFT_DLL)
 
 $(OBJ_DIR)/JackRouter.rc:
-	$(call make_rc_file, $@, "JackRouter ASIO driver")
+	$(call make_rc_file, $@, "JackRouter ASIO driver", VFT_DLL)
 
 $(OBJ_DIR)/JackWinMME.rc:
-	$(call make_rc_file, $@, "Jackmp WinMME Driver")
+	$(call make_rc_file, $@, "Jackmp WinMME Driver", VFT_DLL)
+
+$(OBJ_DIR)/jackd.rc:
+	$(call make_rc_file, $@, "Jackd program", VFT_APP)
 
 %.i: %.c FORCE $(GENERATED) cpp_filter.py
 	$(call c_preprocess, $<, $@)
@@ -864,13 +868,27 @@ define Jack_RC_COMMON
   #define RC_VERSION      $(VER_MAJOR),$(VER_MINOR),$(VER_PATCH),0
   #define RC_VER_STRING  "$(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)"
 
-  #ifndef RC_DLL_NAME
-  #error "Add a 'RC_DLL_NAME' before including me."
+  #ifndef RC_BASENAME
+  #error "Add a 'RC_BASENAME' before including me."
   #endif
 
   #ifndef RC_DESCRIPTION
   #error "Add a 'RC_DESCRIPTION' before including me."
   #endif
+
+  #ifndef RC_FILETYPE
+  #error "Add a 'RC_FILETYPE' before including me."
+  #endif
+
+  #if (RC_FILETYPE == VFT_DLL)
+    #define RC_FILENAME RC_BASENAME ".dll"
+  #elif (RC_FILETYPE == VFT_ALL)
+    #define RC_FILENAME RC_BASENAME ".exe"
+  #else
+    #error "Illegal 'RC_FILETYPE'."
+  #endif
+
+  APPICON ICON  "./windows/Setup/src/jack.ico"
 
   VS_VERSION_INFO VERSIONINFO
     FILEVERSION     RC_VERSION
@@ -879,12 +897,7 @@ define Jack_RC_COMMON
     FILEOS          VOS__WINDOWS32
     FILESUBTYPE     0
     FILEFLAGS       0
-
-    #ifdef RC_FILETYPE
-      FILETYPE        RC_FILETYPE /* Could be set to 'VFT_APP'; i.e. an .exe-file */
-    #else
-      FILETYPE        VFT_DLL     /* Otherwise assume 'VFT_DLL' */
-    #endif
+    FILETYPE        RC_FILETYPE  /* 'VFT_DLL' or 'VFT_APP' */
 
   BEGIN
     BLOCK "StringFileInfo"
@@ -896,8 +909,8 @@ define Jack_RC_COMMON
         VALUE "ProductName",      RC_DESCRIPTION
         VALUE "FileVersion",      RC_VER_STRING " ($(CXX_NAME))"
         VALUE "ProductVersion",   RC_VER_STRING " ($(CXX_NAME))"
-        VALUE "InternalName",     RC_DLL_NAME
-        VALUE "OriginalFilename", RC_DLL_NAME
+        VALUE "InternalName",     RC_FILENAME
+        VALUE "OriginalFilename", RC_FILENAME
         VALUE "LegalCopyright",   "Copyright Grame (C) 2006-2019"
         VALUE "PrivateBuild",     "The private build of <gvanem@yahoo.no>."
         VALUE "Comments",         "Built on $(TODAY)"
@@ -918,11 +931,13 @@ export win32_config_H unistd_H Jack_RC_COMMON
 # Generate a .rc-file with the above common content.
 #  arg1, $(1): The name of the .rc-file.
 #  arg2, $(2): The 'RC_DESCRIPTION' enclosed in '"'.
+#  arg3, $(3): The 'RC_FILETYPE'; 'VFT_DLL' or 'VFT_APP'.
 #
 define make_rc_file
   $(call Generating, $(1), //)
-  $(file >> $(1),  #define RC_DLL_NAME     "$(notdir $(1:.rc=.dll))" )
+  $(file >> $(1),  #define RC_BASENAME     "$(notdir $(1:.rc=))" )
   $(file >> $(1),  #define RC_DESCRIPTION $(2))
+  $(file >> $(1),  #define RC_FILETYPE    $(3))
   $(file >> $(1),$(Jack_RC_COMMON))
 endef
 
