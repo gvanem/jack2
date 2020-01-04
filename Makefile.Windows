@@ -28,14 +28,14 @@ ASIOSDK_ROOT    ?= $(SRC_ROOT)/Sound/Portaudio/old-stuff/ASIOSDK
 #
 USE_ASIO         ?= 0
 USE_CELT         ?= 0
-USE_CRT_DEBUG    ?= 0
-USE_MONITOR      ?= 1
+USE_CRT_DEBUG    ?= 0  # To-do
+USE_MONITOR      ?= 0
 USE_PTHREADS     ?= 1
 USE_WSOCK_TRACE  ?= 0
 USE_MP_COMPILE   ?= 1
 USE_CLANG_FORMAT ?= 1
 
-VPATH = common windows windows/portaudio windows/winmme windows/JackRouter compat/regex example-clients
+VPATH = common windows windows/portaudio windows/winmme windows/JackRouter compat/regex example-clients tests
 
 #
 # The following codes used in macro 'colour_msg' assumes you have
@@ -79,10 +79,10 @@ ifeq ($(CC),gcc)
   #
   # These are all static libraries:
   #
-  CELT_LIB        = $(CELT_ROOT)/libcelt.a
-  SAMPLERATE_LIB ?= $(SAMPLERATE_ROOT)/libsamplerate-0.a
-  PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
-  PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
+  CELT_LIB       = $(CELT_ROOT)/libcelt.a
+  SAMPLERATE_LIB = $(SAMPLERATE_ROOT)/libsamplerate-0.a
+  PORTAUDIO_LIB  = $(PORTAUDIO_ROOT)/lib/libportaudio_x86.a
+  PTHREADS_LIB   = $(PTHREADS_ROOT)/lib/x86/libpthreadGC2.a
 
 else
   #
@@ -98,10 +98,10 @@ else
   #
   # These are all static libraries:
   #
-  CELT_LIB        = $(CELT_ROOT)/celt.lib
-  SAMPLERATE_LIB ?= $(SAMPLERATE_ROOT)/libsamplerate-0.lib
-  PORTAUDIO_LIB  ?= $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
-  PTHREADS_LIB    = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
+  CELT_LIB       = $(CELT_ROOT)/celt.lib
+  SAMPLERATE_LIB = $(SAMPLERATE_ROOT)/libsamplerate-0.lib
+  PORTAUDIO_LIB  = $(PORTAUDIO_ROOT)/lib/portaudio_x86.lib
+  PTHREADS_LIB   = $(PTHREADS_ROOT)/lib/x86/pthreadVC2.lib
 endif
 
 #
@@ -151,7 +151,6 @@ endif
 CFLAGS += -I.               \
           -I./common        \
           -I./common/jack   \
-          -I./windows       \
           -I./compat/alloca \
           -I./compat/regex
 
@@ -171,12 +170,23 @@ ifneq ($(CC),gcc)
 endif
 
 #
-# Put the official 'PortAudio' headers before './windows/portaudio/portaudio.h'
+# If building with 'CC=gcc' and AppVeyor CI, use the bundled
+# 'PortAudio' and 'libsamplerate' herein.
+#
+# Otherwise, put the official 'PortAudio' headers before './windows/portaudio/portaudio.h'
 # Do the same for 'libsamplerate'.
 #
-CFLAGS += -I$(PORTAUDIO_ROOT)/include \
-          -I$(SAMPLERATE_ROOT)/src    \
-          -I./windows/portaudio
+ifeq ($(USER),AppVeyor)
+  CFLAGS        += -I./windows -I./windows/portaudio
+  PORTAUDIO_LIB  = ./windows/Release/bin/libportaudio_x86.a
+  SAMPLERATE_LIB = ./windows/Release/bin/libsamplerate_x86.a
+
+else
+  CFLAGS += -I$(PORTAUDIO_ROOT)/include \
+            -I$(SAMPLERATE_ROOT)/src    \
+            -I./windows                 \
+            -I./windows/portaudio
+endif
 
 #
 # Do not use 'libwsock_trace.a' for MinGW.
@@ -311,9 +321,17 @@ PROGRAM_SRC = common/Jackdmp.cpp            \
                 zombie.c)
 
 PROGRAM_OBJ = $(call cxx_to_obj, $(PROGRAM_SRC))
-PROGRAM_I   = $(call obj_to_i,   $(PROGRAM_OBJ))
 
-.SECONDARY: $(PROGRAM_OBJ)
+TEST_SRC = $(addprefix tests/,           \
+             testAtomic.cpp              \
+             testSynchroClient.cpp       \
+             testSynchroServer.cpp       \
+             testSynchroServerClient.cpp \
+             testThread.cpp)
+
+TEST_OBJ = $(call cxx_to_obj, $(TEST_SRC))
+
+.SECONDARY: $(PROGRAM_OBJ) $(TEST_OBJ)
 
 libJack_SRC = $(addprefix common/,                      \
                 JackAPI.cpp                             \
@@ -482,6 +500,9 @@ SOURCES = $(libJack_SRC)           \
           $(jack_winmme_SRC)       \
           $(PROGRAM_SRC)
 
+ifeq ($(USE_PTHREADS),1)
+  SOURCES += $(TEST_SRC)
+endif
 
 ifneq ($(CC),gcc)
   GETOPT_OBJ = $(OBJ_DIR)/getopt.obj \
@@ -492,8 +513,10 @@ endif
 
 GENERATED += win32_config.h
 
-all: $(OBJ_DIR) bin bin/jack lib $(GENERATED) $(TARGETS)
-	$(call colour_msg,$(BRIGHT_GREEN)Welcome to TARGETS.)
+all: $(OBJ_DIR) bin bin/jack lib $(GENERATED) $(TARGETS) epilogue
+
+epilogue:
+	$(call colour_msg,$(BRIGHT_GREEN)Welcome to TARGETS $(BRIGHT_WHITE)(USER=$(USER)).)
 
 $(OBJ_DIR) bin bin/jack lib:
 	- mkdir $@
@@ -556,38 +579,60 @@ bin/JackRouter.dll: $(jack_router_OBJ) $(OBJ_DIR)/JackRouter.res lib/libJack$(IM
 
 
 #
-# Programs:
+# Main programs:
 #
-bin/jack_netmaster.exe: $(OBJ_DIR)/netmaster.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB) # $(OBJ_DIR)/jack_netmaster.res
+bin/jackd.exe: $(OBJ_DIR)/Jackdmp.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/Jackdmp.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_netslave.exe: $(OBJ_DIR)/netslave.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB) # $(OBJ_DIR)/jack_netslave.res
+bin/jack_connect.exe: $(OBJ_DIR)/connect.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jack_connect.res
+ 	$(call link_EXE, $@, $^)
+
+bin/jack_disconnect.exe: $(OBJ_DIR)/connect.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jack_disconnect.res
+ 	$(call link_EXE, $@, $^)
+
+bin/jack_netmaster.exe: $(OBJ_DIR)/netmaster.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB) $(OBJ_DIR)/jack_netmaster.res
+	$(call link_EXE, $@, $^)
+
+bin/jack_netslave.exe: $(OBJ_DIR)/netslave.$(O) $(GETOPT_OBJ) lib/libJackServer$(IMPLIB) $(OBJ_DIR)/jack_netslave.res
 	$(call link_EXE, $@, $^)
 
 bin/jack_netsource.exe: $(OBJ_DIR)/netsource.$(O) $(OBJ_DIR)/netjack_packet.$(O) $(GETOPT_OBJ) \
-                        lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(SAMPLERATE_LIB) # $(OBJ_DIR)/jack_netsource.res
+                        lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(SAMPLERATE_LIB) $(OBJ_DIR)/jack_netsource.res
 	$(call link_EXE, $@, $^ $(WS2_32_LIB))
 
-bin/jackd.exe: $(OBJ_DIR)/JackDmp.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jackd.res
+bin/jack_load.exe: $(OBJ_DIR)/ipload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jack_load.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_disconnect.exe: $(OBJ_DIR)/connect.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_disconnect.res
- 	$(call link_EXE, $@, $^)
-
-bin/jack_load.exe: $(OBJ_DIR)/ipload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_load.res
+bin/jack_lsp.exe: $(OBJ_DIR)/lsp.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jack_lsp.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_unload.exe: $(OBJ_DIR)/ipunload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_unload.res
+bin/jack_metro.exe: $(OBJ_DIR)/metro.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jack_metro.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_midi_dump.exe: $(OBJ_DIR)/midi_dump.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PTHREADS_LIB) # $(OBJ_DIR)/jack_midi_dump.res
+bin/jack_unload.exe: $(OBJ_DIR)/ipunload.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) $(OBJ_DIR)/jack_unload.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_midi_latency_test.exe: $(OBJ_DIR)/midi_latency_test.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) # $(OBJ_DIR)/jack_midi_latency_test.res
+bin/jack_midi_dump.exe: $(OBJ_DIR)/midi_dump.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(PTHREADS_LIB) $(OBJ_DIR)/jack_midi_dump.res
 	$(call link_EXE, $@, $^)
 
-bin/jack_%.exe: $(OBJ_DIR)/%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) # $(OBJ_DIR)/jack_%.res
-	$(call link_EXE_def, $@, $^)
+bin/jack_midi_latency_test.exe: $(OBJ_DIR)/midi_latency_test.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB) lib/libJackServer$(IMPLIB) $(OBJ_DIR)/jack_midi_latency_test.res
+	$(call link_EXE, $@, $^)
+
+#
+# Test programs:
+#
+bin/jack-cpu.exe: $(OBJ_DIR)/cpu.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+	$(call link_EXE, $@, $^)
+
+#
+# Impossible on WIN32 now.
+#
+$(TEST_OBJ): CFLAGS += -I./posix -DSERVER_EXPORT=
+
+tests: $(addprefix bin/, testSynchroClient.exe testSynchroServer.exe testSynchroServerClient.exe testThread.exe)
+
+bin/test%.exe: $(OBJ_DIR)/test%.$(O) $(GETOPT_OBJ) lib/libJack$(IMPLIB)
+	$(call link_EXE, $@, $^)
 
 #
 # Compile macros + rules:
@@ -632,9 +677,9 @@ $(OBJ_DIR)/%.$(O): %.c
 $(OBJ_DIR)/%.$(O): %.cpp
 	$(call CPP_compile, $<, $@)
 
-
 #
-# Other rules:
+# Create .res-files from .rc-files.
+# And create .rc-files for 'bin/*.dll' files.
 #
 $(OBJ_DIR)/%.res: $(OBJ_DIR)/%.rc
 	$(call make_res, $@, $<)
@@ -678,8 +723,44 @@ $(OBJ_DIR)/JackRouter.rc:
 $(OBJ_DIR)/JackWinMME.rc:
 	$(call make_rc_file, $@, "Jackmp WinMME Driver", VFT_DLL)
 
-$(OBJ_DIR)/jackd.rc:
-	$(call make_rc_file, $@, "Jackd program", VFT_APP)
+#
+# Create .rc-files for 'bin/*.exe' files:
+#
+$(OBJ_DIR)/Jackdmp.rc:
+	$(call make_rc_file, $@, "Jackdmp; audio server daemon", VFT_APP)
+
+$(OBJ_DIR)/jack_connect.rc:
+	$(call make_rc_file, $@, "Connects two named ports", VFT_APP)
+
+$(OBJ_DIR)/jack_disconnect.rc:
+	$(call make_rc_file, $@, "Disconnects two named ports", VFT_APP)
+
+$(OBJ_DIR)/jack_load.rc:
+	$(call make_rc_file, $@, "Loads an in-process client", VFT_APP)
+
+$(OBJ_DIR)/jack_lsp.rc:
+	$(call make_rc_file, $@, "Lists all known ports associated with a JACK server", VFT_APP)
+
+$(OBJ_DIR)/jack_metro.rc:
+	$(call make_rc_file, $@, "Generates a synthetic tick sound for every beat", VFT_APP)
+
+$(OBJ_DIR)/jack_midi_dump.rc:
+	$(call make_rc_file, $@, "Listens for MIDI events on a JACK MIDI port", VFT_APP)
+
+$(OBJ_DIR)/jack_midi_latency_test.rc:
+	$(call make_rc_file, $@, "Measure MIDI latency and jitter", VFT_APP)
+
+$(OBJ_DIR)/jack_netmaster.rc:
+	$(call make_rc_file, $@, "The Master side controller of a netjack connection", VFT_APP)
+
+$(OBJ_DIR)/jack_netslave.rc:
+	$(call make_rc_file, $@, "The Master side of a netjack connection", VFT_APP)
+
+$(OBJ_DIR)/jack_netsource.rc:
+	$(call make_rc_file, $@, "The Master side of a netjack connection", VFT_APP)
+
+$(OBJ_DIR)/jack_unload.rc:
+	$(call make_rc_file, $@, "Unloads an in-process client", VFT_APP)
 
 %.i: %.c FORCE $(GENERATED) cpp_filter.py
 	$(call c_preprocess, $<, $@)
@@ -862,9 +943,6 @@ endef
 # Stuff common to all generated .rc-files:
 #
 define Jack_RC_COMMON
-
-  #include <winver.h>
-
   #define RC_VERSION      $(VER_MAJOR),$(VER_MINOR),$(VER_PATCH),0
   #define RC_VER_STRING  "$(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)"
 
@@ -880,12 +958,12 @@ define Jack_RC_COMMON
   #error "Add a 'RC_FILETYPE' before including me."
   #endif
 
-  #if (RC_FILETYPE == VFT_DLL)
-    #define RC_FILENAME RC_BASENAME ".dll"
-  #elif (RC_FILETYPE == VFT_ALL)
+  #if (RC_FILETYPE == VFT_APP)
     #define RC_FILENAME RC_BASENAME ".exe"
+  #elif (RC_FILETYPE == VFT_DLL)
+    #define RC_FILENAME RC_BASENAME ".dll"
   #else
-    #error "Illegal 'RC_FILETYPE'."
+    #error "Illegal 'RC_FILETYPE', should be VFT_APP or VFT_DLL."
   #endif
 
   APPICON ICON  "./windows/Setup/src/jack.ico"
@@ -897,7 +975,7 @@ define Jack_RC_COMMON
     FILEOS          VOS__WINDOWS32
     FILESUBTYPE     0
     FILEFLAGS       0
-    FILETYPE        RC_FILETYPE  /* 'VFT_DLL' or 'VFT_APP' */
+    FILETYPE        RC_FILETYPE  /* 'VFT_APP' or 'VFT_DLL' */
 
   BEGIN
     BLOCK "StringFileInfo"
@@ -929,12 +1007,13 @@ export win32_config_H unistd_H Jack_RC_COMMON
 
 #
 # Generate a .rc-file with the above common content.
-#  arg1, $(1): The name of the .rc-file.
+#  arg1, $(1): The basename of the .rc-file.
 #  arg2, $(2): The 'RC_DESCRIPTION' enclosed in '"'.
-#  arg3, $(3): The 'RC_FILETYPE'; 'VFT_DLL' or 'VFT_APP'.
+#  arg3, $(3): The 'RC_FILETYPE'; 'VFT_APP' or 'VFT_DLL'.
 #
 define make_rc_file
   $(call Generating, $(1), //)
+  $(file >> $(1),  #include <winver.h>)
   $(file >> $(1),  #define RC_BASENAME     "$(notdir $(1:.rc=))" )
   $(file >> $(1),  #define RC_DESCRIPTION $(2))
   $(file >> $(1),  #define RC_FILETYPE    $(3))
@@ -974,12 +1053,6 @@ endef
 #
 define link_EXE
   $(call colour_msg,$(BRIGHT_GREEN)Linking $(strip $(1)) ...)
-  $(call link_EXE_$(CC), $(1), $(2))
-  @echo
-endef
-
-define link_EXE_def
-  $(call colour_msg,$(BRIGHT_GREEN)Linking $(strip $(1)) $(BRIGHT_YELLOW)(default rule))
   $(call link_EXE_$(CC), $(1), $(2))
   @echo
 endef
@@ -1154,6 +1227,10 @@ endef
 #### 'make depend' stuff #########################################################
 
 DEP_CFLAGS = -MM $(filter -D% -I%, $(CFLAGS)) --include win32_config.h
+
+ifeq ($(USE_PTHREADS),1)
+  DEP_CFLAGS += -I./posix
+endif
 
 #
 # Filter out the 'win32_config.h' header to avoid GNU-make doing too much work.
